@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum EstadoCurso {
+  ACTIVO
+  INACTIVO
+  BORRADOR
+}
+
+enum Modalidad {
+  PRESENCIAL
+  VIRTUAL
+  HIBRIDO
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      UserRole @default(USER)
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cursosCreados Curso[]
+
+  @@map("users")
+}
+
+model Curso {
+  id               String      @id @default(cuid())
+  titulo           String
+  slug             String      @unique
+  descripcion      String?     @db.Text
+  descripcionBreve String?
+  imagenUrl        String?
+  fechaInicio      DateTime?
+  fechaFin         DateTime?
+  duracionHoras    Int         @default(0)
+  modalidad        Modalidad   @default(VIRTUAL)
+  certificado      Boolean     @default(true)
+  precio           Float?
+  cupoMaximo       Int?
+  estado           EstadoCurso @default(ACTIVO)
+  
+  creadorId String
+  creador   User   @relation(fields: [creadorId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cursos")
+}
