@@ -35,7 +35,7 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="py-20 bg-linear-to-r from-red-400 via-orange-400 to-red-500">
+    <section className="py-20 bg-gradient-to-r from-red-400 via-orange-400 to-red-500">
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mx-auto text-center text-white">
           {/* Título */}

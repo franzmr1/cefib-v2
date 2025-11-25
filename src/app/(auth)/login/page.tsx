@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-900 via-blue-800 to-purple-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 flex items-center justify-center p-4">
       {/* Patrón de fondo */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 right-0 w-96 h-96 bg-pink-500 rounded-full blur-3xl"></div>
@@ -32,7 +32,7 @@ export default function LoginPage() {
         {/* Card de login */}
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header con logo y título */}
-          <div className="bg-linear-to-r from-red-500 to-pink-500 p-8 text-white text-center">
+          <div className="bg-li-to-r from-red-500 to-pink-500 p-8 text-white text-center">
             <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
               <Shield className="w-12 h-12 text-red-500" />
             </div>

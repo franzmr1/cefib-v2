@@ -80,7 +80,7 @@ export default function CursosSection() {
             <div className="text-center mt-12">
               <Link
                 href="/cursos"
-                className="inline-flex items-center px-8 py-4 bg-linear-to-r from-red-500 to-pink-500 text-white rounded-full font-bold hover:from-red-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-bold hover:from-red-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <BookOpen className="mr-2 h-5 w-5" />
                 Ver Todos los Cursos

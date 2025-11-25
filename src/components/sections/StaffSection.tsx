@@ -79,7 +79,7 @@ export default function StaffSection() {
             >
               <div className="p-6 flex items-center gap-6">
                 {/* Número identificador */}
-                <div className="w-20 h-20 bg-linear-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-2xl shrink-0">
+                <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-2xl shrink-0">
                   {profesional.id}
                 </div>
 

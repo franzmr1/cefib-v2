@@ -47,7 +47,7 @@ export default function CourseCard({
             unoptimized
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-blue-500 to-purple-500">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500">
             <span className="text-white text-6xl">📚</span>
           </div>
         )}
@@ -111,7 +111,7 @@ export default function CourseCard({
 
           <Link
             href={`/cursos/${id}`}
-            className="px-6 py-3 bg-linear-to-r from-red-500 to-pink-500 text-white rounded-full font-semibold hover:from-red-600 hover:to-pink-600 transition-all shadow-md hover:shadow-lg"
+            className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-semibold hover:from-red-600 hover:to-pink-600 transition-all shadow-md hover:shadow-lg"
           >
             Ver más
           </Link>

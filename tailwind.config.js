@@ -1,6 +1,5 @@
-import type { Config } from 'tailwindcss';
-
-const config: Config = {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,7 +9,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Colores CEFIB
         primary: {
           orange: '#FF6B35',
           blue: '#003D5B',
@@ -20,7 +18,6 @@ const config: Config = {
           'orange-light': '#FF8F5E',
           'blue-light': '#0A5A7D',
         },
-        // Tema oscuro
         dark: {
           bg: '#0A0E27',
           'bg-secondary': '#151934',
@@ -37,6 +34,7 @@ const config: Config = {
       animation: {
         'fade-in': 'fadeIn 0.6s ease-in-out',
         'fade-up': 'fadeUp 0.6s ease-out',
+        'fade-in-up': 'fadeInUp 0.8s ease-out',
         'slide-in-right': 'slideInRight 0.5s ease-out',
         'slide-in-left': 'slideInLeft 0.5s ease-out',
         'scale-up': 'scaleUp 0.3s ease-out',
@@ -52,6 +50,10 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(30px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(40px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
         slideInRight: {
           '0%': { opacity: '0', transform: 'translateX(-50px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
@@ -65,14 +67,7 @@ const config: Config = {
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
       },
-      backgroundImage: {
-        'gradient-cefib': 'linear-gradient(135deg, #003D5B 0%, #FF6B35 100%)',
-        'gradient-cefib-reverse': 'linear-gradient(135deg, #FF6B35 0%, #003D5B 100%)',
-        'gradient-dark': 'linear-gradient(135deg, #0A0E27 0%, #1F2544 100%)',
-      },
     },
   },
   plugins: [],
 };
-
-export default config;

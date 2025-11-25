@@ -1,9 +1,9 @@
 /**
  * Página: Gestión de Cursos
- * Version: v2.0 - CON BÚSQUEDA Y FILTROS FUNCIONALES
+ * Version: v3.0 - TAILWIND V4 COMPLIANT
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-21
- * Descripción: Lista y gestión de cursos con búsqueda en tiempo real y filtros
+ * Fecha: 2025-11-25
+ * Descripción: Lista y gestión de cursos - Sintaxis v4 + UI mejorado
  */
 
 'use client';
@@ -114,22 +114,22 @@ export default function CursosPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Cursos</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Gestión de Cursos</h1>
+          <p className="text-gray-600 mt-1 text-sm md:text-base">
             Administra todos los cursos y programas de formación
           </p>
         </div>
         <Link
           href="/admin/cursos/nuevo"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-red-500 to-pink-500 text-white rounded-lg font-semibold hover:from-red-600 hover:to-pink-600 transition-all shadow-md hover:shadow-lg"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg font-semibold hover:from-red-600 hover:to-pink-600 transition-all shadow-md hover:shadow-lg"
         >
           <Plus className="w-5 h-5" />
-          Nuevo Curso
+          <span>Nuevo Curso</span>
         </Link>
       </div>
 
       {/* Filtros y búsqueda */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-gray-600" />
           <h2 className="font-semibold text-gray-900">Filtros</h2>
@@ -143,17 +143,17 @@ export default function CursosPage() {
           )}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Búsqueda */}
-          <div className="md:col-span-1">
+          <div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="search"
-                placeholder="Buscar por título..."
+                placeholder="Buscar cursos por título..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
               />
             </div>
           </div>
@@ -163,7 +163,7 @@ export default function CursosPage() {
             <select
               value={estadoFilter}
               onChange={(e) => setEstadoFilter(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-sm"
             >
               <option value="">Todos los estados</option>
               <option value="ACTIVO">Activos</option>
@@ -177,7 +177,7 @@ export default function CursosPage() {
             <select
               value={modalidadFilter}
               onChange={(e) => setModalidadFilter(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-sm"
             >
               <option value="">Todas las modalidades</option>
               <option value="VIRTUAL">Virtual</option>
@@ -199,7 +199,7 @@ export default function CursosPage() {
       </div>
 
       {/* Tabla de cursos */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
@@ -211,22 +211,22 @@ export default function CursosPage() {
       </div>
 
       {/* Resumen de estadísticas */}
-      <div className="grid md:grid-cols-4 gap-6">
-        <div className="bg-blue-50 rounded-lg p-6">
-          <p className="text-sm text-blue-600 font-semibold">Total Cursos</p>
-          <p className="text-3xl font-bold text-blue-900 mt-2">{stats.total}</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        <div className="bg-blue-50 rounded-lg p-4 md:p-6">
+          <p className="text-xs md:text-sm text-blue-600 font-semibold">Total Cursos</p>
+          <p className="text-2xl md:text-3xl font-bold text-blue-900 mt-2">{stats.total}</p>
         </div>
-        <div className="bg-green-50 rounded-lg p-6">
-          <p className="text-sm text-green-600 font-semibold">Activos</p>
-          <p className="text-3xl font-bold text-green-900 mt-2">{stats.activos}</p>
+        <div className="bg-green-50 rounded-lg p-4 md:p-6">
+          <p className="text-xs md:text-sm text-green-600 font-semibold">Activos</p>
+          <p className="text-2xl md:text-3xl font-bold text-green-900 mt-2">{stats.activos}</p>
         </div>
-        <div className="bg-orange-50 rounded-lg p-6">
-          <p className="text-sm text-orange-600 font-semibold">Borradores</p>
-          <p className="text-3xl font-bold text-orange-900 mt-2">{stats.borradores}</p>
+        <div className="bg-orange-50 rounded-lg p-4 md:p-6">
+          <p className="text-xs md:text-sm text-orange-600 font-semibold">Borradores</p>
+          <p className="text-2xl md:text-3xl font-bold text-orange-900 mt-2">{stats.borradores}</p>
         </div>
-        <div className="bg-gray-50 rounded-lg p-6">
-          <p className="text-sm text-gray-600 font-semibold">Archivados</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{stats.archivados}</p>
+        <div className="bg-gray-50 rounded-lg p-4 md:p-6">
+          <p className="text-xs md:text-sm text-gray-600 font-semibold">Archivados</p>
+          <p className="text-2xl md:text-3xl font-bold text-gray-900 mt-2">{stats.archivados}</p>
         </div>
       </div>
     </div>

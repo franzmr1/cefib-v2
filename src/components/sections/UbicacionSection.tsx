@@ -17,7 +17,7 @@ export default function UbicacionSection() {
         {/* Título de sección */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
-            <div className="w-20 h-20 bg-linear-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center text-white">
+            <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center text-white">
               <MapPin className="w-10 h-10" />
             </div>
           </div>
@@ -81,7 +81,7 @@ export default function UbicacionSection() {
               href={`https://wa.me/${SITE_CONFIG.contact.whatsapp}?text=${WHATSAPP_MESSAGE}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-8 w-full inline-flex items-center justify-center gap-2 bg-linear-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold hover:from-red-600 hover:to-pink-600 transition-all transform hover:scale-105"
+              className="mt-8 w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold hover:from-red-600 hover:to-pink-600 transition-all transform hover:scale-105"
             >
               <Phone className="w-5 h-5" />
               Contáctanos Ahora

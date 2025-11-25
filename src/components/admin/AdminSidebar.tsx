@@ -1,9 +1,9 @@
 /**
  * Componente: AdminSidebar
- * Version: v1.0
+ * Version: v2.0 - TAILWIND V4 + FIXED LAYOUT
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-19
- * Descripción: Sidebar de navegación para panel admin
+ * Fecha: 2025-11-25
+ * Descripción: Sidebar de navegación - Sintaxis v4 + Position fixed correcto
  */
 
 'use client';
@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, BookOpen, Users, Settings, 
-  FileText, LogOut, Menu, X, ChevronDown
+  FileText, LogOut, Menu, X 
 } from 'lucide-react';
 import { SITE_CONFIG } from '@/constants';
 
@@ -75,10 +75,10 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
 
   return (
     <>
-      {/* Botón menú móvil */}
+      {/* Botón menú móvil - FIXED POSITION */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow"
         aria-label="Toggle menu"
       >
         {isMobileMenuOpen ? (
@@ -91,23 +91,24 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       {/* Overlay móvil */}
       {isMobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 animate-fade-in"
           onClick={() => setIsMobileMenuOpen(false)}
         ></div>
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - FIXED POSITION CORREGIDO */}
       <aside
         className={`
           fixed top-0 left-0 z-40 w-64 h-screen 
-          bg-white border-r border-gray-200 
+          bg-white border-r border-gray-200 shadow-lg
           transition-transform duration-300 ease-in-out
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
+          flex flex-col
         `}
       >
         {/* Logo y título */}
-        <div className="h-16 flex items-center justify-center border-b border-gray-200 bg-linear-to-r from-red-500 to-pink-500">
+        <div className="h-16 flex items-center justify-center border-b border-gray-200 bg-gradient-to-r from-red-500 to-pink-500 shrink-0">
           <Link href="/admin" className="flex items-center gap-3">
             <div className="text-2xl font-bold text-white">
               {SITE_CONFIG.name}
@@ -115,7 +116,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           </Link>
         </div>
 
-        {/* Navegación */}
+        {/* Navegación - SCROLLABLE */}
         <nav className="flex-1 overflow-y-auto p-4">
           <div className="space-y-1">
             {MENU_ITEMS.map((item) => {
@@ -132,12 +133,12 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                     transition-all duration-200
                     ${
                       isActive
-                        ? 'bg-linear-to-r from-red-500 to-pink-500 text-white'
+                        ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md'
                         : 'text-gray-700 hover:bg-gray-100'
                     }
                   `}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-5 h-5 shrink-0" />
                   <span className="font-medium">{item.label}</span>
                 </Link>
               );
@@ -145,20 +146,20 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           </div>
         </nav>
 
-        {/* Usuario y logout */}
-        <div className="border-t border-gray-200 p-4">
+        {/* Usuario y logout - STICKY BOTTOM */}
+        <div className="border-t border-gray-200 p-4 bg-white shrink-0">
           <div className="mb-3 px-4">
-            <p className="text-sm font-semibold text-gray-900">
+            <p className="text-sm font-semibold text-gray-900 truncate">
               {user.name || 'Usuario'}
             </p>
-            <p className="text-xs text-gray-600">{user.email}</p>
+            <p className="text-xs text-gray-600 truncate">{user.email}</p>
           </div>
 
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-5 h-5 shrink-0" />
             <span className="font-medium">Cerrar Sesión</span>
           </button>
         </div>

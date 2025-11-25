@@ -1,9 +1,9 @@
 /**
  * Componente: AdminHeader
- * Version: v1.0
+ * Version: v2.0 - TAILWIND V4 COMPLIANT
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-19
- * Descripción: Header del panel admin con breadcrumbs y acciones
+ * Fecha: 2025-11-25
+ * Descripción: Header del panel admin - Sintaxis v4 + Sticky correcto
  */
 
 'use client';
@@ -40,8 +40,8 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
   const breadcrumbs = getBreadcrumbs(pathname);
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-gray-200 h-16">
-      <div className="h-full px-6 flex items-center justify-between">
+    <header className="sticky top-0 z-30 bg-white border-b border-gray-200 h-16 shadow-sm">
+      <div className="h-full px-4 md:px-6 flex items-center justify-between">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm">
           {breadcrumbs.map((crumb, index) => (
@@ -61,14 +61,14 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
         </div>
 
         {/* Acciones del header */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
           {/* Buscador */}
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="search"
               placeholder="Buscar..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="pl-10 pr-4 py-2 w-64 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
             />
           </div>
 
@@ -83,7 +83,7 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
 
           {/* Avatar del usuario */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-linear-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
               {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
             </div>
           </div>

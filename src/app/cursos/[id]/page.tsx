@@ -48,7 +48,7 @@ export default async function CursoPublicoPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="bg-linear-to-r from-blue-900 to-purple-900 text-white py-20">
+      <div className="bg-gradient-to-r from-blue-900 to-purple-900 text-white py-20">
         <div className="container mx-auto px-6">
           <Link href="/" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6">
             <ArrowLeft className="w-5 h-5" />

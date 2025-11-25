@@ -28,7 +28,7 @@ export default function AsesoramientoSection() {
         {/* Título principal */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
-            <div className="w-20 h-20 bg-linear-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-white">
+            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-white">
               <FileText className="w-10 h-10" />
             </div>
           </div>
@@ -41,7 +41,7 @@ export default function AsesoramientoSection() {
         </div>
 
         {/* Servicios de Asesoramiento */}
-        <div className="bg-linear-to-br from-orange-50 to-red-50 rounded-3xl p-8 md:p-12 mb-12">
+        <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-8 md:p-12 mb-12">
           <h3 className="text-3xl font-bold text-blue-900 mb-8 text-center">
             Servicios de Asesoramiento
           </h3>
@@ -52,7 +52,7 @@ export default function AsesoramientoSection() {
                 className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-orange-200"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-linear-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl shrink-0">
+                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl shrink-0">
                     {servicio.num}
                   </div>
                   <p className="text-gray-900 font-semibold">{servicio.text}</p>
@@ -67,7 +67,7 @@ export default function AsesoramientoSection() {
           {/* Metodología */}
           <div className="bg-white rounded-2xl p-8 shadow-xl">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white">
                 <Lightbulb className="w-8 h-8" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900">Metodología</h3>
@@ -79,7 +79,7 @@ export default function AsesoramientoSection() {
               href={`https://wa.me/${SITE_CONFIG.contact.whatsapp}?text=${WHATSAPP_MESSAGE}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-linear-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-full font-semibold hover:from-blue-600 hover:to-purple-600 transition-all"
+              className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-full font-semibold hover:from-blue-600 hover:to-purple-600 transition-all"
             >
               Consultar Metodología
             </a>
@@ -88,7 +88,7 @@ export default function AsesoramientoSection() {
           {/* Staff de Asesores */}
           <div className="bg-white rounded-2xl p-8 shadow-xl">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-linear-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center text-white">
+              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center text-white">
                 <Award className="w-8 h-8" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900">Staff de Asesores</h3>
@@ -100,7 +100,7 @@ export default function AsesoramientoSection() {
               href={`https://wa.me/${SITE_CONFIG.contact.whatsapp}?text=${WHATSAPP_MESSAGE}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-linear-to-r from-red-500 to-pink-500 text-white px-6 py-3 rounded-full font-semibold hover:from-red-600 hover:to-pink-600 transition-all"
+              className="inline-block bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-3 rounded-full font-semibold hover:from-red-600 hover:to-pink-600 transition-all"
             >
               Solicitar Asesoría
             </a>
