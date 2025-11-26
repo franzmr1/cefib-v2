@@ -233,7 +233,7 @@ export default async function AdminDashboard() {
                 {cursosRecientes.map((curso: CursoReciente) => (
                   <Link
                     key={curso.id}
-                    href={`/admin/cursos/editar/${curso.id}`}
+                    href={`/admin/cursos/${curso.id}`}
                     className="block p-4 md:p-6 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

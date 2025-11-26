@@ -1,6 +1,8 @@
 /**
  * Página: Editar Curso (ADMIN)
- * Version: v1.0
+ * Version: v1.1 - Corregido para ADMIN y SUPER_ADMIN
+ * Autor: Franz (@franzmr1)
+ * Fecha: 2025-11-26
  */
 
 import { notFound, redirect } from 'next/navigation';
@@ -15,13 +17,14 @@ async function verificarAuth() {
   const cookieStore = await cookies();
   const token = cookieStore.get('auth-token')?.value;
 
-  if (!token) {
+  if (! token) {
     redirect('/login');
   }
 
   const user = await getUserFromToken(token);
 
-  if (!user || user.role !== 'ADMIN') {
+  // ✅ CORREGIDO: Permitir ADMIN y SUPER_ADMIN
+  if (! user || ! ['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
     redirect('/login');
   }
 
@@ -32,6 +35,16 @@ async function getCurso(id: string) {
   try {
     const curso = await prisma.curso.findUnique({
       where: { id },
+      include: {
+        creador: {
+          select: {
+            id: true,
+            name: true,
+            apellidos: true,
+            email: true,
+          },
+        },
+      },
     });
     return curso;
   } catch (error) {
@@ -70,6 +83,14 @@ export default async function EditarCursoPage({ params }: PageProps) {
 
       <div className="bg-white rounded-lg shadow-lg p-8">
         <CursoForm userId={user.id} cursoData={curso} />
+      </div>
+
+      {/* Información del creador */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="text-sm text-blue-800">
+          <span className="font-semibold">Creado por:</span>{' '}
+          {curso. creador.name} {curso.creador.apellidos} ({curso.creador.email})
+        </p>
       </div>
     </div>
   );

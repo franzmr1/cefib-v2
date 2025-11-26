@@ -9,13 +9,14 @@ datasource db {
 
 enum UserRole {
   ADMIN
-  USER
+  SUPER_ADMIN
 }
 
 enum EstadoCurso {
   ACTIVO
   INACTIVO
   BORRADOR
+  ARCHIVADO
 }
 
 enum Modalidad {
@@ -24,12 +25,16 @@ enum Modalidad {
   HIBRIDO
 }
 
+// ==========================================
+// MODELO: User (Solo Administradores)
+// ==========================================
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
   name      String?
-  role      UserRole @default(USER)
+  apellidos String?
+  role      UserRole @default(ADMIN)
   image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -37,29 +42,37 @@ model User {
   cursosCreados Curso[]
 
   @@map("users")
+  @@index([email])
+  @@index([role])
 }
 
+// ==========================================
+// MODELO: Curso
+// ==========================================
 model Curso {
-  id               String      @id @default(cuid())
+  id               String       @id @default(cuid())
   titulo           String
-  slug             String      @unique
-  descripcion      String?     @db.Text
-  descripcionBreve String?
-  imagenUrl        String?
-  fechaInicio      DateTime?
+  slug             String       @unique
+  descripcion      String?       @db.Text
+  descripcionBreve String? 
+  imagenUrl        String? 
+  fechaInicio      DateTime? 
   fechaFin         DateTime?
-  duracionHoras    Int         @default(0)
-  modalidad        Modalidad   @default(VIRTUAL)
-  certificado      Boolean     @default(true)
-  precio           Float?
+  duracionHoras    Int          @default(0)
+  modalidad        Modalidad    @default(VIRTUAL)
+  certificado      Boolean      @default(true)
+  precio           Float? 
   cupoMaximo       Int?
-  estado           EstadoCurso @default(ACTIVO)
+  estado           EstadoCurso  @default(BORRADOR)
   
   creadorId String
-  creador   User   @relation(fields: [creadorId], references: [id])
+  creador   User   @relation(fields: [creadorId], references: [id], onDelete: Cascade)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("cursos")
+  @@index([estado])
+  @@index([creadorId])
+  @@index([slug])
 }

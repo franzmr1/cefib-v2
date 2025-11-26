@@ -1,9 +1,9 @@
 /**
  * Layout: Admin Dashboard
- * Version: v2.0 - LAYOUT CORREGIDO
+ * Version: v2.1 - ROLES CORREGIDOS
  * Autor: Franz (@franzmr1)
  * Fecha: 2025-11-25
- * Descripción: Layout para panel de administración - SIDEBAR FIXED CORRECTO
+ * Descripción: Layout para panel de administración - Soporta ADMIN y SUPER_ADMIN
  */
 
 import { redirect } from 'next/navigation';
@@ -17,7 +17,7 @@ import AdminHeader from '@/components/admin/AdminHeader';
  */
 async function verificarAuth() {
   const cookieStore = await cookies();
-  const token = cookieStore.get('auth-token')?.value;
+  const token = cookieStore.get('auth-token')?. value;
 
   if (!token) {
     redirect('/login');
@@ -25,7 +25,8 @@ async function verificarAuth() {
 
   const user = await getUserFromToken(token);
 
-  if (!user || user.role !== 'ADMIN') {
+  // ✅ CORREGIDO: Permitir ADMIN y SUPER_ADMIN
+  if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
     redirect('/login');
   }
 

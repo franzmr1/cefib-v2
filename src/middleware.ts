@@ -6,7 +6,7 @@ const AUTH_ROUTES = ['/login'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get('auth-token')?.value;
+  const token = request.cookies. get('auth-token')?.value;
 
   // Verificar si la ruta es protegida
   const isProtectedRoute = PROTECTED_ROUTES.some(route =>
@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
   if (isProtectedRoute) {
     if (!token) {
       const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('callbackUrl', pathname);
+      loginUrl. searchParams.set('callbackUrl', pathname);
       return NextResponse.redirect(loginUrl);
     }
 
@@ -33,9 +33,9 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    // Verificar rol de admin
-    if (payload.role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/unauthorized', request.url));
+    // ✅ CORREGIDO: Verificar que sea ADMIN o SUPER_ADMIN
+    if (! ['ADMIN', 'SUPER_ADMIN'].includes(payload.role)) {
+      return NextResponse. redirect(new URL('/unauthorized', request.url));
     }
   }
 

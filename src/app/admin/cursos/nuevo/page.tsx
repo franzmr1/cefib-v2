@@ -1,8 +1,8 @@
 /**
  * Página: Crear Nuevo Curso
- * Version: v1.0
+ * Version: v1.1 - Roles corregidos
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-19
+ * Fecha: 2025-11-26
  * Descripción: Formulario para crear un nuevo curso
  */
 
@@ -15,7 +15,7 @@ import Link from 'next/link';
 
 async function verificarAuth() {
   const cookieStore = await cookies();
-  const token = cookieStore.get('auth-token')?.value;
+  const token = cookieStore.get('auth-token')?. value;
 
   if (!token) {
     redirect('/login');
@@ -23,7 +23,8 @@ async function verificarAuth() {
 
   const user = await getUserFromToken(token);
 
-  if (!user || user.role !== 'ADMIN') {
+  // ✅ CORREGIDO: Permitir ADMIN y SUPER_ADMIN
+  if (! user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
     redirect('/login');
   }
 
