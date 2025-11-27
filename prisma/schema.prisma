@@ -7,6 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ==========================================
+// ENUMS EXISTENTES (SIN CAMBIOS)
+// ==========================================
 enum UserRole {
   ADMIN
   SUPER_ADMIN
@@ -26,7 +29,47 @@ enum Modalidad {
 }
 
 // ==========================================
-// MODELO: User (Solo Administradores)
+// ENUMS NUEVOS (PARA DOCENTES Y PARTICIPANTES)
+// ==========================================
+enum TipoDocumento {
+  DNI
+  CARNET_EXTRANJERIA
+  PASAPORTE
+  RUC
+}
+
+enum EstadoDocente {
+  ACTIVO
+  INACTIVO
+}
+
+enum EstadoAsignacion {
+  ACTIVO
+  FINALIZADO
+}
+
+enum EstadoParticipante {
+  ACTIVO
+  INACTIVO
+}
+
+enum EstadoPago {
+  PAGADO
+  PENDIENTE
+  NO_PAGADO
+}
+
+enum MetodoPago {
+  EFECTIVO
+  TRANSFERENCIA
+  YAPE
+  PLIN
+  TARJETA
+  OTRO
+}
+
+// ==========================================
+// MODELO: User (ACTUALIZADO - Solo 1 relación nueva)
 // ==========================================
 model User {
   id        String   @id @default(cuid())
@@ -39,7 +82,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // RELACIÓN EXISTENTE (NO CAMBIA)
   cursosCreados Curso[]
+  
+  // ✅ NUEVA RELACIÓN (para saber quién registró la inscripción)
+  inscripcionesRegistradas Inscripcion[]
 
   @@map("users")
   @@index([email])
@@ -47,13 +94,13 @@ model User {
 }
 
 // ==========================================
-// MODELO: Curso
+// MODELO: Curso (ACTUALIZADO - 3 campos + 2 relaciones nuevas)
 // ==========================================
 model Curso {
   id               String       @id @default(cuid())
   titulo           String
   slug             String       @unique
-  descripcion      String?       @db.Text
+  descripcion      String?      @db.Text
   descripcionBreve String? 
   imagenUrl        String? 
   fechaInicio      DateTime? 
@@ -61,12 +108,20 @@ model Curso {
   duracionHoras    Int          @default(0)
   modalidad        Modalidad    @default(VIRTUAL)
   certificado      Boolean      @default(true)
-  precio           Float? 
+  precio           Float?  
   cupoMaximo       Int?
   estado           EstadoCurso  @default(BORRADOR)
   
+  // RELACIÓN EXISTENTE (NO CAMBIA)
   creadorId String
   creador   User   @relation(fields: [creadorId], references: [id], onDelete: Cascade)
+  
+  // ✅ NUEVO CAMPO: Para llevar control de inscritos
+  cupoActual       Int          @default(0)
+  
+  // ✅ NUEVAS RELACIONES
+  docentes         CursoDocente[]
+  inscripciones    Inscripcion[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -75,4 +130,140 @@ model Curso {
   @@index([estado])
   @@index([creadorId])
   @@index([slug])
+}
+
+// ==========================================
+// MODELO NUEVO: Docente
+// ==========================================
+model Docente {
+  id                String   @id @default(cuid())
+  
+  // Datos Personales
+  nombres           String
+  apellidos         String
+  tipoDocumento     TipoDocumento @default(DNI)
+  numeroDocumento   String   @unique
+  
+  // Datos de Contacto
+  email             String   @unique
+  telefono          String?  
+  celular           String
+  direccion         String?
+  
+  // Datos Profesionales
+  especialidad      String
+  experiencia       String?    // Breve descripción
+  
+  // Estado
+  estado            EstadoDocente @default(ACTIVO)
+  
+  // Relaciones
+  cursosAsignados   CursoDocente[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("docentes")
+  @@index([numeroDocumento])
+  @@index([email])
+  @@index([estado])
+}
+
+// ==========================================
+// MODELO NUEVO: Relación Curso-Docente
+// ==========================================
+model CursoDocente {
+  id              String   @id @default(cuid())
+  
+  cursoId         String
+  curso           Curso    @relation(fields: [cursoId], references: [id], onDelete: Cascade)
+  
+  docenteId       String
+  docente         Docente  @relation(fields: [docenteId], references: [id], onDelete: Cascade)
+  
+  fechaAsignacion DateTime @default(now())
+  estado          EstadoAsignacion @default(ACTIVO)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([cursoId, docenteId])
+  @@map("curso_docente")
+  @@index([cursoId])
+  @@index([docenteId])
+}
+
+// ==========================================
+// MODELO NUEVO: Participante/Estudiante
+// ==========================================
+model Participante {
+  id                  String   @id @default(cuid())
+  
+  // Datos Personales
+  nombres             String
+  apellidos           String
+  tipoDocumento       TipoDocumento @default(DNI)
+  numeroDocumento     String   @unique
+  
+  // Datos de Contacto
+  email               String   @unique
+  telefono            String? 
+  celular             String
+  direccion           String?
+  
+  // Estado
+  estado              EstadoParticipante @default(ACTIVO)
+  
+  // Relaciones
+  inscripciones       Inscripcion[]
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@map("participantes")
+  @@index([numeroDocumento])
+  @@index([email])
+  @@index([estado])
+}
+
+// ==========================================
+// MODELO NUEVO: Inscripción
+// ==========================================
+model Inscripcion {
+  id                    String   @id @default(cuid())
+  codigo                String   @unique  // Auto: INS-2025-00001
+  
+  // Relaciones
+  participanteId        String
+  participante          Participante @relation(fields: [participanteId], references: [id], onDelete: Cascade)
+  
+  cursoId               String
+  curso                 Curso    @relation(fields: [cursoId], references: [id], onDelete: Cascade)
+  
+  // Control
+  fechaInscripcion      DateTime @default(now())
+  
+  // Estado de Pago
+  estadoPago            EstadoPago @default(PENDIENTE)
+  montoPagado           Float    @default(0)
+  fechaPago             DateTime?
+  metodoPago            MetodoPago?  
+  
+  // Asistencia
+  asistio               Boolean  @default(false)
+  observaciones         String?
+  
+  // Auditoría (quién registró la inscripción)
+  registradoPorId       String
+  registradoPor         User     @relation(fields: [registradoPorId], references: [id])
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@unique([participanteId, cursoId])
+  @@map("inscripciones")
+  @@index([cursoId])
+  @@index([participanteId])
+  @@index([estadoPago])
+  @@index([registradoPorId])
 }

@@ -1,9 +1,9 @@
 /**
  * Componente: AdminSidebar
- * Version: v2.0 - TAILWIND V4 + FIXED LAYOUT
+ * Version: v2.1 - CORREGIDO
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-25
- * Descripción: Sidebar de navegación - Sintaxis v4 + Position fixed correcto
+ * Fecha: 2025-11-26
+ * Descripción: Sidebar de navegación con nuevos módulos
  */
 
 'use client';
@@ -12,8 +12,17 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  LayoutDashboard, BookOpen, Users, Settings, 
-  FileText, LogOut, Menu, X 
+  LayoutDashboard, 
+  BookOpen, 
+  Users, 
+  Settings, 
+  FileText, 
+  LogOut, 
+  Menu, 
+  X,
+  GraduationCap,
+  UserCheck,
+  ClipboardList
 } from 'lucide-react';
 import { SITE_CONFIG } from '@/constants';
 
@@ -41,6 +50,21 @@ const MENU_ITEMS = [
     icon: BookOpen,
   },
   {
+    label: 'Docentes',
+    href: '/admin/docentes',
+    icon: GraduationCap,
+  },
+  {
+    label: 'Participantes',
+    href: '/admin/participantes',
+    icon: UserCheck,
+  },
+  {
+    label: 'Inscripciones',
+    href: '/admin/inscripciones',
+    icon: ClipboardList,
+  },
+  {
     label: 'Usuarios',
     href: '/admin/usuarios',
     icon: Users,
@@ -60,6 +84,16 @@ const MENU_ITEMS = [
 export default function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  /**
+   * Determina si una ruta está activa
+   */
+  const isActive = (href: string) => {
+    if (href === '/admin') {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
+  };
 
   /**
    * Maneja el logout del usuario
@@ -96,7 +130,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         ></div>
       )}
 
-      {/* Sidebar - FIXED POSITION CORREGIDO */}
+      {/* Sidebar - FIXED POSITION */}
       <aside
         className={`
           fixed top-0 left-0 z-40 w-64 h-screen 
@@ -120,19 +154,19 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         <nav className="flex-1 overflow-y-auto p-4">
           <div className="space-y-1">
             {MENU_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const Icon = item. icon;
+              const active = isActive(item.href);
 
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={item. href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`
                     flex items-center gap-3 px-4 py-3 rounded-lg
                     transition-all duration-200
                     ${
-                      isActive
+                      active
                         ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md'
                         : 'text-gray-700 hover:bg-gray-100'
                     }

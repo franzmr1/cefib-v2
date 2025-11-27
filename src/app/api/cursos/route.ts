@@ -14,28 +14,34 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(request: NextRequest) {
   try {
+    // Obtener parámetros de búsqueda
+    const { searchParams } = new URL(request.url);
+    const estado = searchParams.get('estado');
+
+    // Construir filtros
+    const where: any = {};
+    
+    if (estado) {
+      where.estado = estado;
+    }
+
+    // Obtener cursos (SIN select, devuelve todos los campos)
     const cursos = await prisma.curso.findMany({
-      where: { estado: 'ACTIVO' },
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        titulo: true,
-        slug: true,
-        descripcionBreve: true,
-        imagenUrl: true,
-        fechaInicio: true,
-        duracionHoras: true,
-        modalidad: true,
-        certificado: true,
-        precio: true,
+      where,
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 
-    return NextResponse.json({ cursos });
+    return NextResponse.json({
+      success: true,
+      cursos,
+    });
+
   } catch (error) {
-    console.error('Error fetching cursos:', error);
+    console.error('[CURSOS_GET] Error:', error);
     return NextResponse.json(
-      { error: 'Error al obtener cursos' },
+      { success: false, error: 'Error al obtener cursos' },
       { status: 500 }
     );
   }
