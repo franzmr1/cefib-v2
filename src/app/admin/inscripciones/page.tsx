@@ -1,18 +1,20 @@
 /**
  * Página: Gestión de Inscripciones
- * Versión: 1.3 - Client Component
+ * Versión: 2.0 - Con Filtros
  * Autor: Franz (@franzmr1)
  * Fecha: 2025-11-26
  */
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback  } from 'react';
 import { Loader2 } from 'lucide-react';
 import InscripcionTable from '@/components/admin/inscripciones/InscripcionTable';
+import InscripcionFilters from '@/components/admin/inscripciones/InscripcionFilters';
 
 export default function InscripcionesPage() {
   const [inscripciones, setInscripciones] = useState<any[]>([]);
+  const [filteredInscripciones, setFilteredInscripciones] = useState<any[]>([]);
   const [stats, setStats] = useState({
     total: 0,
     pagadas: 0,
@@ -28,13 +30,15 @@ export default function InscripcionesPage() {
       const response = await fetch('/api/inscripciones');
       if (response.ok) {
         const data = await response.json();
-        setInscripciones(data.inscripciones || []);
+        const inscripcionesData = data.inscripciones || [];
+        
+        setInscripciones(inscripcionesData);
+        setFilteredInscripciones(inscripcionesData);
         
         // Calcular estadísticas
-        const inscripcionesData = data.inscripciones || [];
-        const pagadas = inscripcionesData. filter((i: any) => i.estadoPago === 'PAGADO'). length;
+        const pagadas = inscripcionesData. filter((i: any) => i.estadoPago === 'PAGADO').length;
         const pendientes = inscripcionesData.filter((i: any) => i.estadoPago === 'PENDIENTE').length;
-        const asistieron = inscripcionesData. filter((i: any) => i.asistio). length;
+        const asistieron = inscripcionesData.filter((i: any) => i.asistio). length;
         const totalRecaudado = inscripcionesData. reduce((sum: number, i: any) => sum + (i.montoPagado || 0), 0);
 
         setStats({
@@ -57,7 +61,7 @@ export default function InscripcionesPage() {
       try {
         const response = await fetch('/api/usuarios/me');
         if (response.ok) {
-          const data = await response. json();
+          const data = await response.json();
           setUserRole(data.user.role);
         }
       } catch (error) {
@@ -73,6 +77,54 @@ export default function InscripcionesPage() {
     setIsLoading(true);
     fetchInscripciones();
   };
+
+  const handleFilterChange = useCallback((filters: any) => {
+  let filtered = [...inscripciones];
+
+  // Filtro por búsqueda
+  if (filters.search) {
+    const searchLower = filters.search.toLowerCase();
+    filtered = filtered.filter(i =>
+      i.participante.nombres.toLowerCase().includes(searchLower) ||
+      i.participante.apellidos.toLowerCase().includes(searchLower) ||
+      i.participante.numeroDocumento.includes(filters.search) ||
+      i.participante. email.toLowerCase().includes(searchLower) ||
+      i.codigo.toLowerCase().includes(searchLower)
+    );
+  }
+
+  // Filtro por curso
+  if (filters.cursoId) {
+    filtered = filtered.filter(i => i.cursoId === filters.cursoId);
+  }
+
+  // Filtro por estado de pago
+  if (filters.estadoPago) {
+    filtered = filtered. filter(i => i.estadoPago === filters.estadoPago);
+  }
+
+  // Filtro por asistencia
+  if (filters.asistencia) {
+    const asistio = filters.asistencia === 'SI';
+    filtered = filtered.filter(i => i.asistio === asistio);
+  }
+
+  // Filtro por fecha desde
+  if (filters.fechaDesde) {
+    filtered = filtered.filter(i => 
+      new Date(i.fechaInscripcion) >= new Date(filters.fechaDesde)
+    );
+  }
+
+  // Filtro por fecha hasta
+  if (filters. fechaHasta) {
+    filtered = filtered.filter(i => 
+      new Date(i. fechaInscripcion) <= new Date(filters.fechaHasta)
+    );
+  }
+
+  setFilteredInscripciones(filtered);
+}, [inscripciones]); // ← Dependencia en inscripciones
 
   if (isLoading) {
     return (
@@ -121,33 +173,20 @@ export default function InscripcionesPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="text-sm text-gray-600">Total Recaudado</div>
           <div className="text-2xl font-bold text-green-600 mt-1">
-            S/ {stats.totalRecaudado.toFixed(2)}
+            S/ {stats.totalRecaudado. toFixed(2)}
           </div>
         </div>
       </div>
 
-      {/* Filtros Rápidos */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <div className="flex flex-wrap gap-2">
-          <span className="text-sm font-medium text-gray-700">Filtros rápidos:</span>
-          <button className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm transition-colors">
-            Todos
-          </button>
-          <button className="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded-full text-sm transition-colors">
-            Pagados
-          </button>
-          <button className="px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full text-sm transition-colors">
-            Pendientes
-          </button>
-          <button className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full text-sm transition-colors">
-            Asistieron
-          </button>
-        </div>
-      </div>
+      {/* Filtros */}
+      <InscripcionFilters 
+        onFilterChange={handleFilterChange}
+        totalResults={filteredInscripciones.length}
+      />
 
       {/* Tabla */}
       <InscripcionTable 
-        inscripciones={inscripciones} 
+        inscripciones={filteredInscripciones}
         onRefresh={handleRefresh} 
         currentUserRole={userRole}
       />
