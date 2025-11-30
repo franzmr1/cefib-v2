@@ -1,119 +1,300 @@
 /**
  * Componente: ServiciosSection
- * Version: v3.0 - TAILWIND V4 COMPLIANT
+ * Versión: 2.1 - Corregido tipado
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-25
- * Descripción: Sección de servicios - Sintaxis v4 + Diseño mejorado y centrado
+ * Fecha: 2025-11-26
  */
 
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { 
-  Briefcase, Heart, CheckCircle, GraduationCap, 
-  Monitor, Flame, ChevronRight 
+  Briefcase, 
+  Heart, 
+  CheckCircle, 
+  GraduationCap, 
+  Monitor, 
+  Flame,
+  ArrowRight,
+  Sparkles
 } from 'lucide-react';
+import { SERVICIOS, ServicioData } from '@/data/servicios';
+import ServicioModal from './ServicioModal';
 
-interface Servicio {
-  id: number;
-  titulo: string;
-  descripcion: string;
-  icon: typeof Briefcase;
-  color: string;
-}
+// Mapeo de iconos
+const ICON_MAP: Record<string, any> = {
+  'briefcase': Briefcase,
+  'heart': Heart,
+  'check-circle': CheckCircle,
+  'graduation-cap': GraduationCap,
+  'monitor': Monitor,
+  'flame': Flame,
+};
 
-const SERVICIOS: Servicio[] = [
-  {
-    id: 1,
-    titulo: 'Proyectos Y Planes',
-    descripcion: 'Un plan está constituido por un conjunto de programas integrados que buscan alcanzar objetivos estratégicos.',
-    icon: Briefcase,
-    color: 'from-red-500 to-pink-500'
-  },
-  {
-    id: 2,
-    titulo: 'Salud',
-    descripcion: 'Programas especializados en gestión hospitalaria, emergencias médicas y salud ocupacional.',
-    icon: Heart,
-    color: 'from-red-500 to-pink-500'
-  },
-  {
-    id: 3,
-    titulo: 'Gestión Pública',
-    descripcion: 'Desarrollo de competencias para liderar y transformar instituciones del Estado.',
-    icon: CheckCircle,
-    color: 'from-red-500 to-pink-500'
-  },
-  {
-    id: 4,
-    titulo: 'Educación',
-    descripcion: 'Pedagogía moderna, diseño curricular, evaluación por competencias y liderazgo pedagógico.',
-    icon: GraduationCap,
-    color: 'from-red-500 to-pink-500'
-  },
-  {
-    id: 5,
-    titulo: 'Tecnología',
-    descripcion: 'Transformación digital, ciberseguridad, cloud computing e inteligencia artificial.',
-    icon: Monitor,
-    color: 'from-red-500 to-pink-500'
-  },
-  {
-    id: 6,
-    titulo: 'Energía Y Minería',
-    descripcion: 'Gestión minera sostenible, seguridad y salud ocupacional, gestión ambiental.',
-    icon: Flame,
-    color: 'from-red-500 to-pink-500'
+// Variantes de animación (corregidas)
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    }
   }
-];
+};
+
+const cardVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 50,
+    scale: 0.9
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 12
+    }
+  }
+};
+
+const iconHoverVariants = {
+  rest: { scale: 1, rotate: 0 },
+  hover: { 
+    scale: 1.1, 
+    rotate: [0, -10, 10, -10, 0],
+    transition: {
+      duration: 0.5
+    }
+  }
+};
 
 export default function ServiciosSection() {
+  const [selectedServicio, setSelectedServicio] = useState<ServicioData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleLeerMas = (servicio: ServicioData) => {
+    setSelectedServicio(servicio);
+    setIsModalOpen(true);
+  };
+
   return (
-    <section id="servicios" className="py-16 md:py-20 bg-gray-50">
-      <div className="container mx-auto px-4 md:px-6">
-        {/* Título de sección */}
-        <div className="text-center mb-12 md:mb-16">
-          <div className="text-red-500 font-semibold mb-3 md:mb-4 uppercase tracking-wider text-sm md:text-base">
-            Nuestros Servicios
-          </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-blue-900 mb-4">
-            PROGRAMAS DE CAPACITACIÓN
-          </h2>
+    <>
+      <section className="py-16 lg:py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Decoraciones de fondo animadas */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            className="absolute -top-24 -right-24 w-96 h-96 bg-[#FF6B35] rounded-full opacity-5"
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 90, 0],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+          <motion.div
+            className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#003366] rounded-full opacity-5"
+            animate={{
+              scale: [1, 1.3, 1],
+              rotate: [0, -90, 0],
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
         </div>
 
-        {/* Grid de servicios - CENTRADO Y RESPONSIVE */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
-          {SERVICIOS.map((servicio) => {
-            const Icon = servicio.icon;
-            return (
-              <div
-                key={servicio.id}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2"
-              >
-                <div className="p-6 md:p-8">
-                  {/* Icono con gradiente v4 */}
-                  <div className={`w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br ${servicio.color} rounded-2xl flex items-center justify-center text-white mb-4 md:mb-6 transform group-hover:scale-110 transition-transform shadow-lg`}>
-                    <Icon className="w-8 h-8 md:w-12 md:h-12" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header con animación */}
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12 lg:mb-16"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+              className="inline-flex items-center gap-2 mb-4"
+            >
+              <Sparkles className="w-5 h-5 text-[#FF6B35]" />
+              <span className="text-[#FF6B35] font-semibold text-sm lg:text-base tracking-wide uppercase">
+                Nuestros Servicios
+              </span>
+              <Sparkles className="w-5 h-5 text-[#FF6B35]" />
+            </motion.div>
+
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#003366] mb-4"
+            >
+              PROGRAMAS DE{' '}
+              <span className="bg-gradient-to-r from-[#FF6B35] to-[#FF8C5A] bg-clip-text text-transparent">
+                CAPACITACIÓN
+              </span>
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="text-gray-600 text-base lg:text-lg max-w-2xl mx-auto"
+            >
+              Programas especializados diseñados para impulsar tu desarrollo profesional
+            </motion.p>
+          </motion.div>
+
+          {/* Grid de Cards con animación */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+          >
+            {SERVICIOS.map((servicio) => {
+              const Icon = ICON_MAP[servicio.icono] || Briefcase;
+
+              return (
+                <motion. div
+                  key={servicio.id}
+                  variants={cardVariants}
+                  whileHover={{ y: -10 }}
+                  className="group relative"
+                >
+                  {/* Card */}
+                  <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 lg:p-8 h-full flex flex-col overflow-hidden">
+                    {/* Efecto de brillo al hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B35]/0 to-[#FF6B35]/0 group-hover:from-[#FF6B35]/5 group-hover:to-[#003366]/5 transition-all duration-500 rounded-2xl" />
+
+                    {/* Borde animado */}
+                    <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-[#FF6B35]/20 transition-all duration-300" />
+
+                    {/* Contenido */}
+                    <div className="relative z-10">
+                      {/* Icono con animación */}
+                      <motion.div
+                        variants={iconHoverVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        className={`w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-br ${servicio.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:shadow-xl transition-shadow`}
+                      >
+                        <Icon className="w-7 h-7 lg:w-8 lg:h-8 text-white" />
+                      </motion.div>
+
+                      {/* Título */}
+                      <h3 className="text-xl lg:text-2xl font-bold text-[#003366] mb-3 group-hover:text-[#FF6B35] transition-colors">
+                        {servicio.titulo}
+                      </h3>
+
+                      {/* Descripción */}
+                      <p className="text-gray-600 text-sm lg:text-base leading-relaxed mb-6 flex-grow">
+                        {servicio.descripcion}
+                      </p>
+
+                      {/* Badge de módulos */}
+                      <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1. 5 rounded-full mb-4">
+                        <Sparkles className="w-4 h-4 text-[#FF6B35]" />
+                        <span className="text-xs font-semibold text-gray-700">
+                          {servicio. temario. length} módulos
+                        </span>
+                      </div>
+
+                      {/* Botón Leer Más con animación */}
+                      <motion.button
+                        onClick={() => handleLeerMas(servicio)}
+                        whileHover={{ x: 5 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="inline-flex items-center gap-2 text-[#FF6B35] font-semibold text-sm lg:text-base group/btn"
+                      >
+                        <span>Leer Más</span>
+                        <motion.div
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ 
+                            duration: 1.5, 
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        >
+                          <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                        </motion. div>
+                      </motion. button>
+                    </div>
+
+                    {/* Partículas decorativas */}
+                    <motion.div
+                      className="absolute top-4 right-4 w-20 h-20 bg-[#FF6B35] rounded-full opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-500"
+                      animate={{
+                        scale: [1, 1.2, 1],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
                   </div>
-                  
-                  {/* Título */}
-                  <h3 className="text-xl md:text-2xl font-bold text-blue-900 mb-3 md:mb-4">
-                    {servicio.titulo}
-                  </h3>
-                  
-                  {/* Descripción */}
-                  <p className="text-gray-600 mb-4 md:mb-6 leading-relaxed text-sm md:text-base">
-                    {servicio.descripcion}
-                  </p>
-                  
-                  {/* Botón leer más */}
-                  <button className="inline-flex items-center text-red-500 font-semibold hover:gap-3 transition-all group text-sm md:text-base">
-                    Leer Más
-                    <ChevronRight className="ml-2 w-4 h-4 md:w-5 md:h-5 transform group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                </motion. div>
+              );
+            })}
+          </motion.div>
+
+          {/* CTA Section con animación */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-12 lg:mt-16 text-center"
+          >
+            <div className="inline-block bg-gradient-to-r from-[#003366] to-[#004488] rounded-2xl p-8 lg:p-10 shadow-2xl">
+              <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
+                ¿No encuentras lo que buscas? 
+              </h3>
+              <p className="text-gray-200 mb-6 max-w-lg mx-auto">
+                Diseñamos programas personalizados según las necesidades de tu organización
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => window.location.href = '/contacto'}
+                className="inline-flex items-center gap-2 bg-[#FF6B35] hover:bg-[#FF8C5A] text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+              >
+                Solicitar Programa Personalizado
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+            </div>
+          </motion. div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Modal */}
+      {selectedServicio && (
+        <ServicioModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setTimeout(() => setSelectedServicio(null), 300);
+          }}
+          servicio={selectedServicio}
+        />
+      )}
+    </>
   );
 }
