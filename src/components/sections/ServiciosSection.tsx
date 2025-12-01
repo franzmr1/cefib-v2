@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { SERVICIOS, ServicioData } from '@/data/servicios';
 import ServicioModal from './ServicioModal';
+import SolicitudProgramaForm from '@/components/public/SolicitudProgramaForm';
+
 
 // Mapeo de iconos
 const ICON_MAP: Record<string, any> = {
@@ -76,11 +78,22 @@ const iconHoverVariants = {
 export default function ServiciosSection() {
   const [selectedServicio, setSelectedServicio] = useState<ServicioData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // ✅ NUEVO: Estado para formulario de solicitud
+  const [showSolicitudForm, setShowSolicitudForm] = useState(false);
+  const [servicioPreseleccionado, setServicioPreseleccionado] = useState<string>('');
 
   const handleLeerMas = (servicio: ServicioData) => {
     setSelectedServicio(servicio);
     setIsModalOpen(true);
   };
+
+  // ✅ NUEVO: Handler para abrir formulario
+  const handleSolicitarPrograma = (servicioId?: string) => {
+    setServicioPreseleccionado(servicioId || '');
+    setShowSolicitudForm(true);
+  };
+  
 
   return (
     <>
@@ -255,7 +268,7 @@ export default function ServiciosSection() {
             })}
           </motion.div>
 
-          {/* CTA Section con animación */}
+                    {/* CTA Section con animación */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -265,7 +278,7 @@ export default function ServiciosSection() {
           >
             <div className="inline-block bg-gradient-to-r from-[#003366] to-[#004488] rounded-2xl p-8 lg:p-10 shadow-2xl">
               <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-                ¿No encuentras lo que buscas? 
+                ¿No encuentras lo que buscas?
               </h3>
               <p className="text-gray-200 mb-6 max-w-lg mx-auto">
                 Diseñamos programas personalizados según las necesidades de tu organización
@@ -273,7 +286,7 @@ export default function ServiciosSection() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => window.location.href = '/contacto'}
+                onClick={() => handleSolicitarPrograma()} // ✅ CAMBIADO
                 className="inline-flex items-center gap-2 bg-[#FF6B35] hover:bg-[#FF8C5A] text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
               >
                 Solicitar Programa Personalizado
@@ -295,6 +308,13 @@ export default function ServiciosSection() {
           servicio={selectedServicio}
         />
       )}
+      
+      {/* ✅ NUEVO: Modal de Solicitud */}
+      <SolicitudProgramaForm
+        isOpen={showSolicitudForm}
+        onClose={() => setShowSolicitudForm(false)}
+        servicioPreseleccionado={servicioPreseleccionado}
+      />
     </>
   );
 }

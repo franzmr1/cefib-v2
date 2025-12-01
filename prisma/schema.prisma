@@ -84,9 +84,11 @@ model User {
 
   // RELACIÓN EXISTENTE (NO CAMBIA)
   cursosCreados Curso[]
+  inscripcionesRegistradas Inscripcion[]
+
   
   // ✅ NUEVA RELACIÓN (para saber quién registró la inscripción)
-  inscripcionesRegistradas Inscripcion[]
+  solicitudesAsignadas     Solicitud[] @relation("SolicitudesAsignadas")
 
   @@map("users")
   @@index([email])
@@ -266,4 +268,94 @@ model Inscripcion {
   @@index([participanteId])
   @@index([estadoPago])
   @@index([registradoPorId])
+}
+
+// ============================================
+// MÓDULO: SOLICITUDES DE PROGRAMAS PERSONALIZADOS
+// Autor: Franz (@franzmr1)
+// Fecha: 2025-11-26
+// ============================================
+
+model Solicitud {
+  id                String   @id @default(cuid())
+  folio             String   @unique @default(cuid())
+  
+  // Datos del solicitante
+  nombres           String
+  email             String
+  telefono          String?
+  empresa           String?
+  cargo             String?
+  
+  // Detalles de la solicitud
+  servicioInteres   ServicioSolicitud
+  tipoPrograma      TipoProgramaSolicitud @default(INDIVIDUAL)
+  numParticipantes  Int? 
+  mensaje           String    @db.Text
+  comoNosConociste  String?
+  
+  // Gestión interna (ADMIN)
+  estado            EstadoSolicitud @default(NUEVO)
+  prioridad         PrioridadSolicitud @default(NORMAL)
+  notasInternas     String?   @db.Text
+  
+  // Asignación a usuario admin (relación con User existente)
+  asignadoA         String?
+  asignadoUsuario   User?      @relation("SolicitudesAsignadas", fields: [asignadoA], references: [id], onDelete: SetNull)
+  
+  // Metadata de seguridad
+  ip                String?
+  userAgent         String?
+  origen            String?
+  
+  // Consentimiento
+  aceptoTerminos    Boolean   @default(false)
+  
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  fechaContacto     DateTime?
+  fechaCierre       DateTime?
+  
+  @@index([estado])
+  @@index([servicioInteres])
+  @@index([createdAt])
+  @@index([asignadoA])
+  @@map("solicitudes")
+}
+
+// ============================================
+// ENUMS PARA SOLICITUDES
+// ============================================
+
+enum ServicioSolicitud {
+  PROYECTOS_PLANES
+  SALUD
+  GESTION_PUBLICA
+  EDUCACION
+  TECNOLOGIA
+  ENERGIA_MINERIA
+  OTRO
+}
+
+enum TipoProgramaSolicitud {
+  INDIVIDUAL
+  CORPORATIVO
+}
+
+enum EstadoSolicitud {
+  NUEVO
+  EN_REVISION
+  CONTACTADO
+  EN_NEGOCIACION
+  CERRADO_EXITOSO
+  CERRADO_SIN_EXITO
+  CANCELADO
+}
+
+enum PrioridadSolicitud {
+  BAJA
+  NORMAL
+  ALTA
+  URGENTE
 }
