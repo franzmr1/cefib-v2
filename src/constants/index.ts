@@ -13,9 +13,9 @@ export const SITE_CONFIG = {
   },
   
   social: {
-    facebook: 'https://facebook.com/cefib',
-    instagram: 'https://instagram.com/cefib',
-    linkedin: 'https://linkedin.com/company/cefib',
+    facebook: 'https://facebook.com/cefib.sac',
+    instagram: 'https://instagram.com/cefibsac',
+    
   },
 } as const;
 

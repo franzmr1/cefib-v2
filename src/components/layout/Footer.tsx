@@ -26,11 +26,7 @@ export default function Footer() {
       href: SITE_CONFIG.social.instagram,
       icon: Instagram,
     },
-    {
-      name: 'LinkedIn',
-      href: SITE_CONFIG.social.linkedin,
-      icon: Linkedin,
-    },
+    
   ];
 
   return (
@@ -110,7 +106,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 text-red-400 shrink-0" />
-                <span className="text-sm">Lima, Perú</span>
+                <span className="text-sm">Trujillo, Perú</span>
               </li>
             </ul>
           </div>
