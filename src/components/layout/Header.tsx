@@ -60,25 +60,32 @@ export default function Header() {
       <nav className="container mx-auto px-4 py-3 md:py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href={ROUTES.HOME} className="flex items-center gap-2 md:gap-3">
-            <div className="relative h-10 w-10 md:h-12 md:w-12">
-              <Image
-                src="/logo.png"
-                alt={`Logo ${SITE_CONFIG.name}`}
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
-                {SITE_CONFIG.name}
-              </h1>
-              <p className="text-xs text-gray-600 hidden md:block">
-                {SITE_CONFIG.tagline}
-              </p>
-            </div>
-          </Link>
+<Link 
+  href={ROUTES.HOME} 
+  className="flex items-center gap-2 md:gap-3 group"
+>
+  {/* Solo logo "C" */}
+  <div className="relative h-11 w-11 md:h-14 md:w-14 shrink-0 group-hover:scale-110 transition-transform duration-300">
+    <Image
+      src="/images/logo/logo-C.png"
+      alt="Logo CEFIB"
+      fill
+      className="object-contain drop-shadow-md"
+      priority
+      unoptimized
+    />
+  </div>
+
+  {/* Texto HTML (oculto en móvil pequeño) */}
+  <div className="hidden sm:block">
+    <h1 className="text-xl md:text-2xl font-bold text-[#003366] leading-tight">
+      CEFIB
+    </h1>
+    <p className="text-[10px] md:text-xs text-[#FF6B35] font-bold tracking-widest uppercase">
+      Train Win Leaders
+    </p>
+  </div>
+</Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6 xl:gap-8">
