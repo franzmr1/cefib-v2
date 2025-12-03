@@ -22,7 +22,8 @@ import {
   GraduationCap,
   UserCheck,
   ClipboardList,
-  Inbox
+  Inbox,
+  Shield
 } from 'lucide-react';
 import { SITE_CONFIG } from '@/constants';
 
@@ -90,6 +91,11 @@ const BASE_MENU_ITEMS: MenuItem[] = [
     label: 'Configuración',
     href: '/admin/configuracion',
     icon: Settings,
+  },
+  {
+  href: '/admin/audit-logs',
+  label: 'Logs de Auditoría',
+  icon: Shield,
   },
 ];
 

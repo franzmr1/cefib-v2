@@ -1,10 +1,30 @@
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
+import { randomBytes } from 'crypto';
+import { generateCSRFToken, hashToken } from './csrf';
 
-const secret = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'fallback-secret-key'
-);
+const getSecretKey = () => {
+  const secret = process.env.JWT_SECRET;
+  
+  if (!secret) {
+    throw new Error(
+      '❌ ERROR CRÍTICO: JWT_SECRET no está configurado en .env\n' +
+      'Genera uno con: openssl rand -base64 32'
+    );
+  }
+
+  if (secret.length < 32) {
+    throw new Error(
+      '❌ ERROR: JWT_SECRET debe tener al menos 32 caracteres\n' +
+      `Actual: ${secret.length} caracteres`
+    );
+  }
+
+  return new TextEncoder().encode(secret);
+};
+
+const secret = getSecretKey();
 
 export interface TokenPayload {
   userId: string;
@@ -115,3 +135,5 @@ export async function getUserFromToken(token: string) {
 
   return user;
 }
+
+

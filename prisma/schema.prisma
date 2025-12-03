@@ -89,6 +89,9 @@ model User {
   
   // ✅ NUEVA RELACIÓN (para saber quién registró la inscripción)
   solicitudesAsignadas     Solicitud[] @relation("SolicitudesAsignadas")
+  refreshTokens            RefreshToken[]
+  auditLogs                AuditLog[]
+
 
   @@map("users")
   @@index([email])
@@ -358,4 +361,113 @@ enum PrioridadSolicitud {
   NORMAL
   ALTA
   URGENTE
+}
+
+// ============================================
+// MÓDULO: REFRESH TOKENS (SEGURIDAD)
+// Autor: Franz (@franzmr1)
+// Fecha: 2025-11-27
+// Descripción: Tokens de refresco para sesiones seguras
+// ============================================
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  csrfToken String?
+
+  // Relación con User existente
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+// ============================================
+// MÓDULO: AUDIT LOGS (AUDITORÍA)
+// Autor: Franz (@franzmr1)
+// Fecha: 2025-11-27
+// Descripción: Registro de acciones para auditoría de seguridad
+// ============================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  
+  // Usuario que realizó la acción (puede ser null si es anónimo)
+  userId    String? 
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Acción realizada
+  action    AuditAction
+  
+  // Entidad afectada (ej: "Curso", "User", "Inscripcion")
+  entity    String? 
+  entityId  String?
+  
+  // Detalles adicionales en JSON
+  details   Json?
+  
+  // Metadata de seguridad
+  ipAddress String?
+  userAgent String? 
+  
+  // Resultado de la acción
+  success   Boolean  @default(true)
+  errorMessage String?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// Tipos de acciones auditables
+enum AuditAction {
+  // Autenticación
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+  TOKEN_REFRESH
+  PASSWORD_CHANGE
+  
+  // Usuarios
+  USER_CREATE
+  USER_UPDATE
+  USER_DELETE
+  
+  // Cursos
+  CURSO_CREATE
+  CURSO_UPDATE
+  CURSO_DELETE
+  CURSO_PUBLISH
+  
+  // Inscripciones
+  INSCRIPCION_CREATE
+  INSCRIPCION_UPDATE
+  INSCRIPCION_DELETE
+  
+  // Docentes
+  DOCENTE_CREATE
+  DOCENTE_UPDATE
+  DOCENTE_DELETE
+  
+  // Solicitudes
+  SOLICITUD_UPDATE
+  SOLICITUD_ASSIGN
+  SOLICITUD_CLOSE
+  
+  // Newsletter
+  NEWSLETTER_SUBSCRIBE
+  
+  // Otros
+  ADMIN_ACCESS
+  API_ERROR
 }

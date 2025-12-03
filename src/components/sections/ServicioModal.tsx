@@ -157,7 +157,7 @@ export default function ServicioModal({ isOpen, onClose, servicio }: ServicioMod
                   <button
                     onClick={() => {
                       onClose();
-                      window.location.href = '/contacto';
+                      window.location.href = 'https://wa.me/${SITE_CONFIG.contact.whatsapp}?text=${WHATSAPP_MESSAGE';
                     }}
                     className="inline-flex items-center gap-2 bg-[#FF6B35] hover:bg-[#FF8C5A] text-white px-6 lg:px-8 py-2.5 lg:py-3 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg text-sm lg:text-base"
                   >

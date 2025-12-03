@@ -6,7 +6,7 @@ const AUTH_ROUTES = ['/login'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies. get('auth-token')?.value;
+  const token = request.cookies.get('auth-token')?.value;
 
   // Verificar si la ruta es protegida
   const isProtectedRoute = PROTECTED_ROUTES.some(route =>
@@ -21,21 +21,22 @@ export async function middleware(request: NextRequest) {
   if (isProtectedRoute) {
     if (!token) {
       const loginUrl = new URL('/login', request.url);
-      loginUrl. searchParams.set('callbackUrl', pathname);
+      loginUrl.searchParams.set('callbackUrl', pathname);
       return NextResponse.redirect(loginUrl);
     }
 
     const payload = await verifyToken(token);
 
     if (!payload) {
+      // Token inválido o expirado
       const response = NextResponse.redirect(new URL('/login', request.url));
       response.cookies.delete('auth-token');
       return response;
     }
 
-    // ✅ CORREGIDO: Verificar que sea ADMIN o SUPER_ADMIN
+    // Verificar que sea ADMIN o SUPER_ADMIN
     if (! ['ADMIN', 'SUPER_ADMIN'].includes(payload.role)) {
-      return NextResponse. redirect(new URL('/unauthorized', request.url));
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
   }
 
@@ -47,7 +48,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  return NextResponse. next();
 }
 
 export const config = {
