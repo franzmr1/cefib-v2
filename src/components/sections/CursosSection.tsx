@@ -1,10 +1,8 @@
 /**
  * Componente: CursosSection
- * Version: v1.0
+ * Version: v2.0 - Mejorado con límite y botón "Ver todos"
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-19
- * Descripción: Sección de cursos dinámicos desde base de datos
- * Tipo: Client Component (usa useEffect para fetch)
+ * Fecha: 2025-12-03
  */
 
 'use client';
@@ -32,7 +30,6 @@ export default function CursosSection() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch cursos desde la API
     fetch('/api/cursos')
       .then(res => res.json())
       .then(data => {
@@ -44,6 +41,9 @@ export default function CursosSection() {
         setIsLoading(false);
       });
   }, []);
+
+  // ✅ NUEVO: Mostrar solo 6 cursos en home
+  const cursosLimitados = cursos.slice(0, 6);
 
   return (
     <section id="cursos" className="py-20 bg-white">
@@ -69,21 +69,21 @@ export default function CursosSection() {
           </div>
         ) : cursos.length > 0 ? (
           <>
-            {/* Grid de cursos */}
+            {/* Grid de cursos - ✅ LIMITADO A 6 */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {cursos.map((curso: Curso) => (
-                <CourseCard key={curso.id} {...curso} />
+              {cursosLimitados.map((curso: Curso) => (
+                <CourseCard key={curso. id} {...curso} />
               ))}
             </div>
 
-            {/* Botón ver todos */}
+            {/* Botón ver todos - ✅ SIEMPRE VISIBLE SI HAY CURSOS */}
             <div className="text-center mt-12">
               <Link
                 href="/cursos"
                 className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-bold hover:from-red-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <BookOpen className="mr-2 h-5 w-5" />
-                Ver Todos los Cursos
+                Ver Todos los Cursos ({cursos.length})
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Link>
             </div>
