@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
 
     const user = await getUserFromToken(token);
 
-    if (!user || user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+    if (!user || ! ['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
+      return NextResponse. json({ error: 'No autorizado' }, { status: 403 });
     }
 
     // Obtener TODOS los cursos (sin filtro de estado)

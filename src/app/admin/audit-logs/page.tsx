@@ -1,6 +1,6 @@
 /**
  * Página: Admin - Audit Logs
- * Version: v1.0
+ * Version: v1.1 - CORREGIDO
  * Autor: Franz (@franzmr1)
  * Descripción: Panel para visualizar logs de auditoría
  */
@@ -28,10 +28,10 @@ interface AuditLog {
 }
 
 interface LogStats {
-  total: number;
-  failed: number;
-  successRate: number;
-  byAction: Array<{ action: string; count: number }>;
+  totalAcciones: number;      // ✅ CORREGIDO
+  accionesFallidas: number;   // ✅ CORREGIDO
+  tasaExito: string;          // ✅ CORREGIDO: Ya es string
+  topAcciones: Array<{ action: string; count: number }>; // ✅ CORREGIDO
 }
 
 export default function AuditLogsPage() {
@@ -71,9 +71,9 @@ export default function AuditLogsPage() {
     const csv = [
       ['Fecha', 'Usuario', 'Acción', 'Entidad', 'IP', 'Éxito'],
       ...filteredLogs. map((log) => [
-        new Date(log.createdAt). toLocaleString('es-PE'),
+        new Date(log.createdAt).toLocaleString('es-PE'),
         log.user?.email || 'Anónimo',
-        log. action,
+        log.action,
         log.entity || '-',
         log.ipAddress || '-',
         log.success ?  'Sí' : 'No',
@@ -83,10 +83,10 @@ export default function AuditLogsPage() {
       . join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document. createElement('a');
-    a. href = url;
-    a. download = `audit-logs-${new Date().toISOString(). split('T')[0]}.csv`;
+    const url = window. URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `audit-logs-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
   };
 
@@ -131,15 +131,16 @@ export default function AuditLogsPage() {
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-blue-50 rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">Total Acciones</p>
-              <p className="text-2xl font-bold text-[#003366]">{stats. total}</p>
+              <p className="text-2xl font-bold text-[#003366]">{stats. totalAcciones}</p>
             </div>
             <div className="bg-red-50 rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">Fallidas</p>
-              <p className="text-2xl font-bold text-red-700">{stats.failed}</p>
+              <p className="text-2xl font-bold text-red-700">{stats.accionesFallidas}</p>
             </div>
             <div className="bg-green-50 rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">Tasa de Éxito</p>
-              <p className="text-2xl font-bold text-green-700">{stats.successRate. toFixed(1)}%</p>
+              {/* ✅ CORREGIDO: stats.tasaExito ya es string */}
+              <p className="text-2xl font-bold text-green-700">{stats.tasaExito}%</p>
             </div>
           </div>
         )}
@@ -151,7 +152,7 @@ export default function AuditLogsPage() {
           <Filter className="w-5 h-5 text-gray-600" />
           <select
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(e) => setFilter(e. target.value)}
             className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="all">Todas las acciones</option>
@@ -188,7 +189,7 @@ export default function AuditLogsPage() {
                 {filteredLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {new Date(log.createdAt).toLocaleString('es-PE', {
+                      {new Date(log.createdAt). toLocaleString('es-PE', {
                         dateStyle: 'short',
                         timeStyle: 'short',
                       })}
@@ -204,7 +205,7 @@ export default function AuditLogsPage() {
                     <td className="px-6 py-4 text-sm text-gray-600">{log.ipAddress || '-'}</td>
                     <td className="px-6 py-4">
                       {log.success ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-2. 5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           Éxito
                         </span>
                       ) : (

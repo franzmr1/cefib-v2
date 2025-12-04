@@ -1,13 +1,16 @@
 /**
  * API Route: /api/cursos/[id]
- * Version: v2.0 - COMPATIBLE CON NEXT.JS 16
+ * Version: v3.0 - CON AUDIT LOGGING Y REVALIDACIÓN
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-21
+ * Fecha: 2025-12-03
  * Descripción: GET, PATCH (editar), DELETE (eliminar) curso específico
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { logAudit, getClientIP, getUserAgent } from '@/lib/audit-logger';
+import { getUserFromToken } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -21,9 +24,9 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const { id } = await params; // ← AWAIT AQUÍ
+    const { id } = await params;
 
-    const curso = await prisma.curso.findUnique({
+    const curso = await prisma.curso. findUnique({
       where: { id },
     });
 
@@ -52,24 +55,20 @@ export async function PATCH(
   { params }: RouteParams
 ) {
   try {
-    const { id } = await params; // ← AWAIT AQUÍ
-    const body = await request.json();
+    const { id } = await params;
 
-    const {
-      titulo,
-      slug,
-      descripcionBreve,
-      descripcion,
-      imagenUrl,
-      fechaInicio,
-      fechaFin,
-      duracionHoras,
-      modalidad,
-      certificado,
-      precio,
-      cupoMaximo,
-      estado,
-    } = body;
+    // Verificar autenticación
+    const token = request.cookies.get('auth-token')?.value;
+    
+    if (!token) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const user = await getUserFromToken(token);
+
+    if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
+      return NextResponse. json({ error: 'No autorizado' }, { status: 403 });
+    }
 
     // Verificar que el curso existe
     const existingCurso = await prisma.curso.findUnique({
@@ -83,44 +82,81 @@ export async function PATCH(
       );
     }
 
-    // Si se cambia el slug, verificar que no exista otro con ese slug
-    if (slug && slug !== existingCurso.slug) {
-      const slugExists = await prisma.curso.findUnique({
-        where: { slug },
-      });
+    const body = await request.json();
 
-      if (slugExists) {
-        return NextResponse.json(
-          { error: 'El slug ya existe. Por favor usa otro.' },
-          { status: 400 }
-        );
-      }
+    // Guardar estado anterior para audit log
+    const cambios: any = {};
+    if (body.estado && body.estado !== existingCurso.estado) {
+      cambios.estado = {
+        antes: existingCurso.estado,
+        despues: body. estado,
+      };
+    }
+    if (body.titulo && body.titulo !== existingCurso.titulo) {
+      cambios.titulo = {
+        antes: existingCurso.titulo,
+        despues: body. titulo,
+      };
     }
 
     // Actualizar curso
-    const curso = await prisma.curso.update({
+    const updatedCurso = await prisma.curso.update({
       where: { id },
       data: {
-        titulo,
-        slug,
-        descripcionBreve: descripcionBreve || null,
-        descripcion: descripcion || null,
-        imagenUrl: imagenUrl || null,
-        fechaInicio: fechaInicio ? new Date(fechaInicio) : null,
-        fechaFin: fechaFin ? new Date(fechaFin) : null,
-        duracionHoras: Number(duracionHoras),
-        modalidad,
-        certificado: Boolean(certificado),
-        precio: precio ? Number(precio) : null,
-        cupoMaximo: cupoMaximo ? Number(cupoMaximo) : null,
-        estado,
+        ...body,
+        fechaInicio: body.fechaInicio ? new Date(body. fechaInicio) : undefined,
+        fechaFin: body.fechaFin ? new Date(body.fechaFin) : undefined,
+        duracionHoras: body.duracionHoras ? Number(body.duracionHoras) : undefined,
+        precio: body.precio !== undefined ? Number(body.precio) : undefined,
+        cupoMaximo: body.cupoMaximo !== undefined ? Number(body.cupoMaximo) : undefined,
+        certificado: body.certificado !== undefined ? Boolean(body.certificado) : undefined,
       },
     });
 
-    console.log('Curso actualizado exitosamente:', curso.titulo);
-    return NextResponse.json({ curso });
+    // ✅ REGISTRAR EN AUDIT LOG
+    await logAudit({
+      action: 'CURSO_UPDATE',
+      userId: user.id,
+      entity: 'Curso',
+      entityId: updatedCurso.id,
+      details: {
+        titulo: updatedCurso.titulo,
+        cambios,
+      },
+      ipAddress: getClientIP(request.headers),
+      userAgent: getUserAgent(request. headers),
+      success: true,
+    });
+
+    // ✅ REVALIDAR CACHE
+    revalidatePath('/cursos');
+    revalidatePath(`/cursos/${updatedCurso. slug}`);
+    revalidatePath('/admin/cursos');
+
+    console.log('✅ Curso actualizado:', updatedCurso. titulo);
+    return NextResponse.json({ curso: updatedCurso });
   } catch (error) {
     console.error('Error updating curso:', error);
+
+    // Log de error
+    const token = request. cookies.get('auth-token')?.value;
+    const user = token ? await getUserFromToken(token) : null;
+
+    if (user) {
+      const { id } = await params;
+      await logAudit({
+        action: 'CURSO_UPDATE',
+        userId: user.id,
+        entity: 'Curso',
+        entityId: id,
+        details: { error: String(error) },
+        ipAddress: getClientIP(request. headers),
+        userAgent: getUserAgent(request.headers),
+        success: false,
+        errorMessage: String(error),
+      });
+    }
+
     return NextResponse.json(
       { error: 'Error al actualizar curso' },
       { status: 500 }
@@ -136,10 +172,23 @@ export async function DELETE(
   { params }: RouteParams
 ) {
   try {
-    const { id } = await params; // ← AWAIT AQUÍ
+    const { id } = await params;
+
+    // Verificar autenticación
+    const token = request.cookies.get('auth-token')?. value;
+    
+    if (! token) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const user = await getUserFromToken(token);
+
+    if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+    }
 
     // Verificar que el curso existe
-    const existingCurso = await prisma.curso.findUnique({
+    const existingCurso = await prisma.curso. findUnique({
       where: { id },
     });
 
@@ -155,6 +204,27 @@ export async function DELETE(
       where: { id },
     });
 
+    // ✅ REGISTRAR EN AUDIT LOG
+    await logAudit({
+      action: 'CURSO_DELETE',
+      userId: user.id,
+      entity: 'Curso',
+      entityId: existingCurso.id,
+      details: {
+        titulo: existingCurso.titulo,
+        slug: existingCurso.slug,
+        estado: existingCurso.estado,
+      },
+      ipAddress: getClientIP(request.headers),
+      userAgent: getUserAgent(request.headers),
+      success: true,
+    });
+
+    // ✅ REVALIDAR CACHE
+    revalidatePath('/cursos');
+    revalidatePath(`/cursos/${existingCurso.slug}`);
+    revalidatePath('/admin/cursos');
+
     console.log('Curso eliminado exitosamente:', existingCurso.titulo);
     return NextResponse.json({ 
       message: 'Curso eliminado exitosamente',
@@ -162,6 +232,26 @@ export async function DELETE(
     });
   } catch (error) {
     console.error('Error deleting curso:', error);
+
+    // Log de error
+    const token = request.cookies.get('auth-token')?.value;
+    const user = token ? await getUserFromToken(token) : null;
+
+    if (user) {
+      const { id } = await params;
+      await logAudit({
+        action: 'CURSO_DELETE',
+        userId: user. id,
+        entity: 'Curso',
+        entityId: id,
+        details: { error: String(error) },
+        ipAddress: getClientIP(request.headers),
+        userAgent: getUserAgent(request.headers),
+        success: false,
+        errorMessage: String(error),
+      });
+    }
+
     return NextResponse.json(
       { error: 'Error al eliminar curso' },
       { status: 500 }
