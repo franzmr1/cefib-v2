@@ -42,7 +42,7 @@ const SERVICIO_LABELS: Record<string, string> = {
   GESTION_PUBLICA: 'Gestión Pública',
   EDUCACION: 'Educación',
   TECNOLOGIA: 'Tecnología',
-  ENERGIA_MINERIA: 'Energía Y Minería',
+  ENERGIA_MINERIA: 'Energía y Minería',
   OTRO: 'Otro',
 };
 

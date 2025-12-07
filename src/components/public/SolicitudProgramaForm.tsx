@@ -402,7 +402,7 @@ export default function SolicitudProgramaForm({
                       <option value="GESTION_PUBLICA">Gestión Pública</option>
                       <option value="EDUCACION">Educación</option>
                       <option value="TECNOLOGIA">Tecnología</option>
-                      <option value="ENERGIA_MINERIA">Energía Y Minería</option>
+                      <option value="ENERGIA_MINERIA">Energía y Minería</option>
                       <option value="OTRO">Otro</option>
                     </select>
                     {errors.servicioInteres && (

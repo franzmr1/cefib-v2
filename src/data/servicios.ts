@@ -226,7 +226,7 @@ export const SERVICIOS: ServicioData[] = [
   },
   {
     id: 'energia-mineria',
-    titulo: 'Energía Y Minería',
+    titulo: 'Energía y Minería',
     descripcion: 'Gestión minera sostenible, seguridad y salud ocupacional, gestión ambiental.',
     icono: 'flame',
     color: 'from-[#FF6B35] to-[#FF8C5A]',

@@ -23,6 +23,9 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import { showToast } from '@/lib/toast';
+import RichTextEditor from '@/components/ui/RichTextEditor';
+
 
 interface CursoFormProps {
   userId: string;
@@ -184,7 +187,7 @@ export default function CursoForm({ userId, cursoData }: CursoFormProps) {
         throw new Error(errorData.error || 'Error al guardar el curso');
       }
 
-      alert(isEditing ? 'Curso actualizado exitosamente' : 'Curso creado exitosamente');
+      showToast.success(isEditing ? 'Curso actualizado exitosamente' : 'Curso creado exitosamente');
       router.push('/admin/cursos');
       router.refresh();
     } catch (error: any) {
@@ -319,14 +322,11 @@ export default function CursoForm({ userId, cursoData }: CursoFormProps) {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Descripción Breve
                   </label>
-                  <textarea
-                    name="descripcionBreve"
-                    value={formData.descripcionBreve}
-                    onChange={handleChange}
-                    rows={2}
-                    maxLength={160}
-                    placeholder="Resumen corto que aparece en las tarjetas (máx. 160 caracteres)"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  <RichTextEditor
+                    value={formData.descripcion}
+                    onChange={(value) => setFormData(prev => ({ ...prev, descripcion: value }))}
+                    placeholder="Describe el curso: objetivos, temario, metodología, beneficios..."
+                    minHeight="400px"
                   />
                   <p className="mt-1 text-xs text-gray-500 text-right">
                     {formData. descripcionBreve. length}/160 caracteres
