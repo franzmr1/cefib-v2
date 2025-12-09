@@ -1,18 +1,25 @@
 /**
  * WhatsApp Widget Flotante
- * Version: v1.0
+ * Version: v1.1 - Con ocultamiento en admin
  * Autor: Franz (@franzmr1)
+ * Fecha: 2025-12-07
  */
 
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation'; // ✅ AGREGAR ESTA IMPORTACIÓN
 import { MessageCircle, X } from 'lucide-react';
 import { SITE_CONFIG } from '@/constants';
 
 export default function WhatsAppWidget() {
+  const pathname = usePathname(); // ✅ AGREGAR ESTO
   const [isVisible, setIsVisible] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+
+  // ✅ AGREGAR ESTA VALIDACIÓN
+  // No mostrar en rutas de admin ni login
+  const shouldHide = pathname?. startsWith('/admin') || pathname?.startsWith('/login');
 
   // Mostrar widget después de 3 segundos
   useEffect(() => {
@@ -35,7 +42,8 @@ export default function WhatsAppWidget() {
     window.open(whatsappUrl, '_blank');
   };
 
-  if (!isVisible) return null;
+  // ✅ CAMBIAR ESTA LÍNEA
+  if (! isVisible || shouldHide) return null;
 
   return (
     <>
@@ -51,7 +59,7 @@ export default function WhatsAppWidget() {
             </button>
             
             <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
-              ¿Necesitas ayuda?
+              ¿Necesitas ayuda? 
             </p>
             <p className="text-xs text-gray-600 dark:text-gray-400">
               Escríbenos por WhatsApp y te responderemos en minutos

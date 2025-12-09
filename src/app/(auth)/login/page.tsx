@@ -31,13 +31,24 @@ export default function LoginPage() {
       <div className="w-full max-w-md relative z-10">
         {/* Card de login */}
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          {/* Header con logo y título */}
-          <div className="bg-li-to-r from-red-500 to-pink-500 p-8 text-white text-center">
-            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="w-12 h-12 text-red-500" />
+          {/* ✅ Header mejorado con logo visible */}
+          <div className="bg-gradient-to-r from-red-500 to-pink-500 p-8 text-white text-center relative overflow-hidden">
+            {/* Decoración de fondo */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
+            
+            <div className="relative z-10">
+              {/* Logo CEFIB con fondo oscuro para contraste */}
+              <div className="w-24 h-24 bg-gradient-to-br from-[#003366] to-[#004488] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl border-4 border-white/20">
+                <div className="text-center">
+                  <span className="block text-2xl font-black text-white">CEFIB</span>
+                  <span className="block text-[10px] text-orange-300 font-semibold tracking-wider">TRAIN WIN LEADERS</span>
+                </div>
+              </div>
+              
+              <h1 className="text-2xl font-bold mb-2 drop-shadow-lg">Panel de Administración</h1>
+              <p className="text-sm text-red-100">Sistema de Gestión Académica</p>
             </div>
-            <h1 className="text-2xl font-bold mb-2">{SITE_CONFIG.name}</h1>
-            <p className="text-sm text-red-100">Panel de Administración</p>
           </div>
 
           {/* Contenido del formulario */}

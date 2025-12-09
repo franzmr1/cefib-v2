@@ -1,55 +1,24 @@
 /**
  * API Route: Newsletter Subscribe
- * Version: v1.0
- * Descripción: Endpoint para guardar emails de suscriptores
+ * Version: v2. 0 - Migrado a Prisma
+ * Autor: Franz (@franzmr1)
+ * Fecha: 2025-12-07
+ * Descripción: Endpoint para suscripciones al newsletter (ahora con DB)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, readFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
+import { prisma } from '@/lib/prisma';
+import { logAudit, getClientIP, getUserAgent } from '@/lib/audit-logger';
+import { getUserFromToken } from '@/lib/auth';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const SUBSCRIBERS_FILE = path.join(DATA_DIR, 'subscribers.json');
-
-// Interfaz de suscriptor
-interface Subscriber {
-  id: string;
-  email: string;
-  subscribedAt: string;
-  ipAddress?: string;
-}
-
-// Asegurar que existe el directorio
-async function ensureDataDir() {
-  if (!existsSync(DATA_DIR)) {
-    await mkdir(DATA_DIR, { recursive: true });
-  }
-}
-
-// Leer suscriptores
-async function getSubscribers(): Promise<Subscriber[]> {
-  await ensureDataDir();
-  
-  if (!existsSync(SUBSCRIBERS_FILE)) {
-    return [];
-  }
-
-  const data = await readFile(SUBSCRIBERS_FILE, 'utf-8');
-  return JSON.parse(data);
-}
-
-// Guardar suscriptores
-async function saveSubscribers(subscribers: Subscriber[]) {
-  await ensureDataDir();
-  await writeFile(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
-}
-
+/**
+ * POST - Suscribirse al newsletter
+ */
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();
 
-    // Validación
+    // Validación de email
     if (!email || typeof email !== 'string') {
       return NextResponse.json(
         { error: 'Email es requerido' },
@@ -57,7 +26,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar formato de email
+    // Validar formato
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -66,80 +35,199 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Leer suscriptores existentes
-    const subscribers = await getSubscribers();
+    const emailNormalized = email.toLowerCase(). trim();
 
     // Verificar si ya existe
-    const exists = subscribers.find(
-      (sub) => sub.email.toLowerCase() === email.toLowerCase()
-    );
+    const existente = await prisma.newsletter.findUnique({
+      where: { email: emailNormalized },
+    });
 
-    if (exists) {
-      return NextResponse. json(
+    if (existente) {
+      // Si existe pero está inactivo, reactivarlo
+      if (! existente.activo) {
+        const reactivado = await prisma.newsletter.update({
+          where: { email: emailNormalized },
+          data: { 
+            activo: true,
+            ip: getClientIP(request. headers),
+            userAgent: getUserAgent(request.headers),
+            updatedAt: new Date(),
+          },
+        });
+
+        await logAudit({
+          action: 'NEWSLETTER_SUBSCRIBE',
+          entity: 'Newsletter',
+          entityId: reactivado.id,
+          details: { email: reactivado.email, accion: 'reactivacion' },
+          ipAddress: getClientIP(request.headers),
+          userAgent: getUserAgent(request.headers),
+          success: true,
+        });
+
+        return NextResponse.json({
+          success: true,
+          message: 'Suscripción reactivada exitosamente',
+          subscriber: {
+            id: reactivado.id,
+            email: reactivado.email,
+            subscribedAt: reactivado.createdAt,
+          },
+        });
+      }
+
+      return NextResponse.json(
         { error: 'Este email ya está suscrito' },
         { status: 409 }
       );
     }
 
-    // Crear nuevo suscriptor
-    const newSubscriber: Subscriber = {
-      id: `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      email: email.toLowerCase(),
-      subscribedAt: new Date().toISOString(),
-      ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
-    };
+    // Crear nueva suscripción
+    const nuevoSuscriptor = await prisma.newsletter.create({
+      data: {
+        email: emailNormalized,
+        ip: getClientIP(request.headers),
+        userAgent: getUserAgent(request.headers),
+        origen: 'website',
+      },
+    });
 
-    // Agregar y guardar
-    subscribers.push(newSubscriber);
-    await saveSubscribers(subscribers);
+    // Registrar en audit log
+    await logAudit({
+      action: 'NEWSLETTER_SUBSCRIBE',
+      entity: 'Newsletter',
+      entityId: nuevoSuscriptor.id,
+      details: { email: nuevoSuscriptor.email },
+      ipAddress: getClientIP(request.headers),
+      userAgent: getUserAgent(request.headers),
+      success: true,
+    });
+
+    console.log('✅ Nueva suscripción:', nuevoSuscriptor.email);
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Suscripción exitosa',
+        message: '¡Gracias por suscribirte!  Te mantendremos informado.',
         subscriber: {
-          id: newSubscriber. id,
-          email: newSubscriber.email,
-          subscribedAt: newSubscriber.subscribedAt,
+          id: nuevoSuscriptor.id,
+          email: nuevoSuscriptor.email,
+          subscribedAt: nuevoSuscriptor.createdAt,
         },
       },
       { status: 201 }
     );
+
   } catch (error) {
-    console.error('Error en suscripción:', error);
+    console.error('Error en suscripción newsletter:', error);
+
+    await logAudit({
+      action: 'NEWSLETTER_SUBSCRIBE',
+      entity: 'Newsletter',
+      details: { error: String(error) },
+      ipAddress: getClientIP(request.headers),
+      userAgent: getUserAgent(request. headers),
+      success: false,
+      errorMessage: String(error),
+    });
+
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error al procesar suscripción' },
       { status: 500 }
     );
   }
 }
 
-// Endpoint para obtener todos los suscriptores (solo admin)
+/**
+ * GET - Obtener suscriptores (Solo Admin)
+ */
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Agregar autenticación aquí
-    const authHeader = request.headers.get('authorization');
+    // Verificar autenticación con token de cookie
+    const token = request.cookies.get('auth-token')?.value;
     
-    // Protección básica (cambiar por autenticación real)
-    if (authHeader !== `Bearer ${process.env.ADMIN_SECRET_KEY}`) {
+    if (!token) {
       return NextResponse.json(
         { error: 'No autorizado' },
         { status: 401 }
       );
     }
 
-    const subscribers = await getSubscribers();
+    const user = await getUserFromToken(token);
 
-    return NextResponse.json({
-      total: subscribers.length,
-      subscribers: subscribers.sort(
-        (a, b) => new Date(b.subscribedAt).getTime() - new Date(a.subscribedAt).getTime()
-      ),
+    if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user. role)) {
+      return NextResponse.json(
+        { error: 'No autorizado - Solo administradores' },
+        { status: 403 }
+      );
+    }
+
+    // Obtener parámetros de consulta
+    const { searchParams } = new URL(request.url);
+    const activo = searchParams.get('activo');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams. get('limit') || '100');
+
+    const skip = (page - 1) * limit;
+
+    // Filtros
+    const where: any = {};
+    if (activo !== null && activo !== undefined) {
+      where.activo = activo === 'true';
+    }
+
+    // Obtener suscriptores
+    const [subscribers, total] = await Promise. all([
+      prisma.newsletter.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          email: true,
+          activo: true,
+          origen: true,
+          ip: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+      prisma.newsletter. count({ where }),
+    ]);
+
+    // Registrar acceso
+    await logAudit({
+      action: 'ADMIN_ACCESS',
+      userId: user.id,
+      entity: 'Newsletter',
+      details: { accion: 'listar_suscriptores', total },
+      ipAddress: getClientIP(request.headers),
+      userAgent: getUserAgent(request.headers),
+      success: true,
     });
+
+    return NextResponse. json({
+      total,
+      subscribers: subscribers.map(sub => ({
+        id: sub. id,
+        email: sub. email,
+        subscribedAt: sub.createdAt,
+        activo: sub. activo,
+        origen: sub.origen,
+        ipAddress: sub.ip,
+      })),
+      pagination: {
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+
   } catch (error) {
-    console.error('Error al obtener suscriptores:', error);
+    console. error('Error al obtener suscriptores:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error al obtener suscriptores' },
       { status: 500 }
     );
   }

@@ -133,6 +133,9 @@ export default function CursosGrid({ showFilters = false, limit }: CursosGridPro
               <option value="SALUD">Salud</option>
               <option value="TECNOLOGIA">Tecnología</option>
               <option value="EDUCACION">Educación</option>
+              <option value="PROYECTOS_PLANES">Proyectos y Planes</option>
+              <option value="ENERGIA_MINERIA">Energía y Minería</option>
+              <option value="OTRO">Otro</option>
             </select>
           </div>
 

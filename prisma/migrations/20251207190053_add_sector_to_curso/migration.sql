@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "SectorCurso" AS ENUM ('GESTION_PUBLICA', 'SALUD', 'TECNOLOGIA', 'EDUCACION', 'PROYECTOS_PLANES', 'ENERGIA_MINERIA', 'OTRO');
+
+-- AlterTable
+ALTER TABLE "cursos" ADD COLUMN     "sector" "SectorCurso";

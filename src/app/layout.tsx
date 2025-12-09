@@ -1,7 +1,8 @@
 /**
  * Layout: Root Layout
- * Version: v2.1 - Con Dark Mode, Toast y WhatsApp Widget
+ * Version: v2. 2 - Con Dark Mode optimizado
  * Autor: Franz (@franzmr1)
+ * Fecha: 2025-12-07
  */
 
 import type { Metadata } from 'next';
@@ -31,16 +32,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React. ReactNode }) {
   return (
     <html lang="es" suppressHydrationWarning className={`${inter.variable} ${poppins.variable}`}>
-      <body suppressHydrationWarning className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-        <ThemeProvider 
-          attribute="class" 
-          defaultTheme="light" 
-          enableSystem
-          disableTransitionOnChange
-        >
+      <body 
+        suppressHydrationWarning 
+        className="bg-white dark:bg-dark-bg text-gray-900 dark:text-dark-text transition-colors duration-300"
+      >
+        <ThemeProvider>
           {children}
           
-          {/* Toast Notifications */}
+          {/* Toast Notifications con soporte dark mode */}
           <Toaster
             position="top-right"
             reverseOrder={false}
@@ -61,6 +60,7 @@ export default function RootLayout({ children }: { children: React. ReactNode })
                   primary: '#10b981',
                   secondary: '#fff',
                 },
+                className: 'dark:bg-green-900 dark:text-green-100',
               },
               error: {
                 duration: 5000,
@@ -68,12 +68,14 @@ export default function RootLayout({ children }: { children: React. ReactNode })
                   primary: '#ef4444',
                   secondary: '#fff',
                 },
+                className: 'dark:bg-red-900 dark:text-red-100',
               },
               loading: {
                 iconTheme: {
                   primary: '#3b82f6',
                   secondary: '#fff',
                 },
+                className: 'dark:bg-blue-900 dark:text-blue-100',
               },
             }}
           />

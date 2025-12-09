@@ -1,8 +1,8 @@
 /**
  * Componente: CursoTable
- * Version: v2.0 - CON REFRESH
+ * Version: v2.1 - Con slug y nueva pestaña
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-21
+ * Fecha: 2025-12-07
  * Descripción: Tabla de cursos con acciones y callback de refresh
  */
 
@@ -15,6 +15,7 @@ import { Edit, Trash2, Eye, Calendar, Clock } from 'lucide-react';
 interface Curso {
   id: string;
   titulo: string;
+  slug: string;  // ✅ AGREGADO
   estado: string;
   modalidad: string;
   duracionHoras: number;
@@ -36,7 +37,7 @@ export default function CursoTable({ cursos, onRefresh }: CursoTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string, titulo: string) => {
-    if (!confirm(`¿Estás seguro de eliminar el curso "${titulo}"?\n\nEsta acción no se puede deshacer.`)) {
+    if (! confirm(`¿Estás seguro de eliminar el curso "${titulo}"?\n\nEsta acción no se puede deshacer.`)) {
       return;
     }
 
@@ -47,7 +48,7 @@ export default function CursoTable({ cursos, onRefresh }: CursoTableProps) {
         method: 'DELETE',
       });
 
-      if (!response.ok) {
+      if (! response.ok) {
         throw new Error('Error al eliminar');
       }
 
@@ -161,7 +162,7 @@ export default function CursoTable({ cursos, onRefresh }: CursoTableProps) {
                 </div>
               </td>
               <td className="px-6 py-4 text-sm text-gray-700">
-                {curso.precio ? `S/ ${curso.precio.toFixed(2)}` : 'Consultar'}
+                {curso.precio ?  `S/ ${curso.precio. toFixed(2)}` : 'Consultar'}
               </td>
               <td className="px-6 py-4 text-sm text-gray-700">
                 {curso.fechaInicio ? (
@@ -175,13 +176,16 @@ export default function CursoTable({ cursos, onRefresh }: CursoTableProps) {
               </td>
               <td className="px-6 py-4 text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <Link
-                    href={`/cursos/${curso.id}`}
+                  {/* ✅ BOTÓN "VER CURSO" ACTUALIZADO */}
+                  <a
+                    href={`/cursos/${curso.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    title="Ver curso"
+                    title="Ver curso en nueva pestaña"
                   >
                     <Eye className="w-4 h-4" />
-                  </Link>
+                  </a>
                   <Link
                     href={`/admin/cursos/${curso.id}`}
                     className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
@@ -190,7 +194,7 @@ export default function CursoTable({ cursos, onRefresh }: CursoTableProps) {
                     <Edit className="w-4 h-4" />
                   </Link>
                   <button
-                    onClick={() => handleDelete(curso.id, curso.titulo)}
+                    onClick={() => handleDelete(curso.id, curso. titulo)}
                     disabled={deletingId === curso.id}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                     title="Eliminar curso"

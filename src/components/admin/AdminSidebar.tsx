@@ -23,7 +23,8 @@ import {
   UserCheck,
   ClipboardList,
   Inbox,
-  Shield
+  Shield,
+  Mail
 } from 'lucide-react';
 import { SITE_CONFIG } from '@/constants';
 
@@ -88,15 +89,15 @@ const BASE_MENU_ITEMS: MenuItem[] = [
     icon: FileText,
   },
   {
-    label: 'Configuración',
-    href: '/admin/configuracion',
-    icon: Settings,
-  },
-  {
   href: '/admin/audit-logs',
   label: 'Logs de Auditoría',
   icon: Shield,
   },
+  {
+  label: 'Newsletter',
+  href: '/admin/newsletter',
+  icon: Mail,
+  }
 ];
 
 // Cache key para localStorage

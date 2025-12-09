@@ -1,8 +1,8 @@
 /**
  * Componente: DocenteForm
- * Versión: 1.0
+ * Versión: 1.1 - Con Toast Notifications y validación corregida
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-26
+ * Fecha: 2025-12-07
  * Descripción: Formulario para crear/editar docentes
  */
 
@@ -10,7 +10,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { showToast } from '@/lib/toast'; // ✅ IMPORTAR TOAST
 
 interface DocenteFormProps {
   docenteData?: any;
@@ -26,7 +27,7 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
     nombres: docenteData?.nombres || '',
     apellidos: docenteData?.apellidos || '',
     tipoDocumento: docenteData?.tipoDocumento || 'DNI',
-    numeroDocumento: docenteData?.numeroDocumento || '',
+    numeroDocumento: docenteData?. numeroDocumento || '',
     email: docenteData?.email || '',
     telefono: docenteData?.telefono || '',
     celular: docenteData?.celular || '',
@@ -45,7 +46,7 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React. FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrors({});
@@ -75,18 +76,22 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
             fieldErrors[detail.field] = detail.message;
           });
           setErrors(fieldErrors);
+          
+          // ✅ TOAST DE ERROR CON DETALLES
+          showToast. error('Por favor corrige los errores en el formulario');
         } else if (data.field) {
           // Error específico de campo
           setErrors({ [data.field]: data.error });
+          showToast.error(data.error);
         } else {
           // Error general
-          alert(data.error || 'Error al guardar docente');
+          showToast.error(data.error || 'Error al guardar docente'); // ✅ TOAST
         }
         return;
       }
 
-      // Éxito
-      alert(data.message || 'Docente guardado exitosamente');
+      // ✅ ÉXITO CON TOAST
+      showToast.success(data.message || 'Docente guardado exitosamente');
       
       if (onSuccess) {
         onSuccess();
@@ -97,7 +102,7 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
 
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al guardar docente');
+      showToast.error('Error de conexión.  Intenta nuevamente. '); // ✅ TOAST
     } finally {
       setIsSubmitting(false);
     }
@@ -105,6 +110,23 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* ✅ MENSAJE DE ERROR GENERAL */}
+      {Object.keys(errors).length > 0 && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-sm font-semibold text-red-800 mb-1">
+                Hay errores en el formulario
+              </h3>
+              <p className="text-sm text-red-700">
+                Por favor revisa los campos marcados en rojo
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Datos Personales */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -124,12 +146,15 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
               value={formData.nombres}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                errors.nombres ? 'border-red-500' : 'border-gray-300'
+                errors.nombres ? 'border-red-500 bg-red-50' : 'border-gray-300'
               }`}
               required
             />
             {errors. nombres && (
-              <p className="mt-1 text-sm text-red-600">{errors.nombres}</p>
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {errors.nombres}
+              </p>
             )}
           </div>
 
@@ -145,12 +170,15 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
               value={formData.apellidos}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                errors.apellidos ? 'border-red-500' : 'border-gray-300'
+                errors.apellidos ? 'border-red-500 bg-red-50' : 'border-gray-300'
               }`}
               required
             />
             {errors.apellidos && (
-              <p className="mt-1 text-sm text-red-600">{errors. apellidos}</p>
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {errors.apellidos}
+              </p>
             )}
           </div>
 
@@ -186,13 +214,16 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
               value={formData.numeroDocumento}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                errors.numeroDocumento ? 'border-red-500' : 'border-gray-300'
+                errors. numeroDocumento ? 'border-red-500 bg-red-50' : 'border-gray-300'
               }`}
               required
               disabled={!! docenteData}
             />
             {errors.numeroDocumento && (
-              <p className="mt-1 text-sm text-red-600">{errors. numeroDocumento}</p>
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {errors.numeroDocumento}
+              </p>
             )}
           </div>
         </div>
@@ -217,12 +248,15 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
               value={formData.email}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
+                errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
               }`}
               required
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {errors. email}
+              </p>
             )}
           </div>
 
@@ -239,35 +273,38 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
               onChange={handleChange}
               placeholder="987654321"
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                errors.celular ? 'border-red-500' : 'border-gray-300'
+                errors.celular ? 'border-red-500 bg-red-50' : 'border-gray-300'
               }`}
               required
             />
             {errors.celular && (
-              <p className="mt-1 text-sm text-red-600">{errors.celular}</p>
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {errors.celular}
+              </p>
             )}
           </div>
 
-          {/* Teléfono */}
+          {/* Teléfono - ✅ OPCIONAL, SIN REQUIRED */}
           <div>
             <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
-              Teléfono (Opcional)
+              Teléfono <span className="text-gray-400 text-xs">(Opcional)</span>
             </label>
             <input
               type="tel"
               id="telefono"
               name="telefono"
-              value={formData.telefono}
+              value={formData. telefono}
               onChange={handleChange}
               placeholder="014567890"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
             />
           </div>
 
-          {/* Dirección */}
+          {/* Dirección - ✅ OPCIONAL, SIN REQUIRED */}
           <div>
             <label htmlFor="direccion" className="block text-sm font-medium text-gray-700 mb-1">
-              Dirección (Opcional)
+              Dirección <span className="text-gray-400 text-xs">(Opcional)</span>
             </label>
             <input
               type="text"
@@ -301,12 +338,15 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
               onChange={handleChange}
               placeholder="Ej: Gestión Pública, Derecho, etc."
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                errors.especialidad ? 'border-red-500' : 'border-gray-300'
+                errors.especialidad ? 'border-red-500 bg-red-50' : 'border-gray-300'
               }`}
               required
             />
-            {errors.especialidad && (
-              <p className="mt-1 text-sm text-red-600">{errors.especialidad}</p>
+            {errors. especialidad && (
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {errors.especialidad}
+              </p>
             )}
           </div>
 
@@ -327,10 +367,10 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
             </select>
           </div>
 
-          {/* Experiencia */}
+          {/* Experiencia - ✅ OPCIONAL, SIN REQUIRED */}
           <div className="md:col-span-2">
             <label htmlFor="experiencia" className="block text-sm font-medium text-gray-700 mb-1">
-              Experiencia (Opcional)
+              Experiencia <span className="text-gray-400 text-xs">(Opcional)</span>
             </label>
             <textarea
               id="experiencia"
@@ -339,8 +379,11 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
               onChange={handleChange}
               rows={3}
               placeholder="Breve descripción de la experiencia profesional..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
             />
+            <p className="mt-1 text-xs text-gray-500">
+              Describe brevemente la trayectoria y experiencia del docente
+            </p>
           </div>
         </div>
       </div>
@@ -350,16 +393,17 @@ export default function DocenteForm({ docenteData, onSuccess }: DocenteFormProps
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg font-semibold hover:from-red-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg font-semibold hover:from-red-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all hover:shadow-lg"
         >
           {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-          {isSubmitting ? 'Guardando...' : docenteData ? 'Actualizar' : 'Crear Docente'}
+          {isSubmitting ? 'Guardando...' : docenteData ?  'Actualizar Docente' : 'Crear Docente'}
         </button>
 
         <button
           type="button"
           onClick={() => router. back()}
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+          disabled={isSubmitting}
+          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
           Cancelar
         </button>

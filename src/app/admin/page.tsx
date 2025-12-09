@@ -134,13 +134,7 @@ export default async function AdminDashboard() {
       href: '/admin/cursos',
       color: 'bg-gradient-to-r from-blue-500 to-purple-500',
     },
-    {
-      titulo: 'Configuración',
-      descripcion: 'Ajustes del sistema',
-      icon: Settings,
-      href: '/admin/configuracion',
-      color: 'bg-gradient-to-r from-gray-600 to-gray-700',
-    },
+    
   ];
 
   return (

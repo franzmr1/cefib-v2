@@ -18,7 +18,7 @@ export async function createRefreshToken(userId: string): Promise<{
 }> {
   const refreshToken = randomBytes(32).toString('hex');
   const csrfToken = randomBytes(32).toString('hex');
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 días
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // ✅ 1 hora (3600 segundos)
 
   await prisma.refreshToken.create({
     data: {

@@ -16,6 +16,7 @@ import CursoTable from '@/components/admin/cursos/CursoTable';
 interface Curso {
   id: string;
   titulo: string;
+  slug: string;
   estado: string;
   modalidad: string;
   duracionHoras: number;

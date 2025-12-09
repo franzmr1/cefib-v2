@@ -1,13 +1,15 @@
 /**
  * Página: Catálogo Completo de Cursos
  * Ruta: /cursos
- * Version: v1.0
+ * Version: v1.1 - Con botón de volver al inicio
  * Autor: Franz (@franzmr1)
+ * Fecha: 2025-12-07
  */
 
 import { Metadata } from 'next';
 import CursosGrid from '@/components/sections/CursosGrid';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Home } from 'lucide-react';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Cursos - CEFIB',
@@ -20,7 +22,17 @@ export default function CursosPage() {
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-400 to-blue-900 text-white py-16">
         <div className="container mx-auto px-6">
-          <div className="flex items-center gap-4 mb-4">
+          {/* Botón volver al inicio */}
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors group"
+          >
+            <Home className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-medium">Volver al inicio</span>
+          </Link>
+
+          {/* Título y descripción */}
+          <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center">
               <BookOpen className="w-8 h-8" />
             </div>

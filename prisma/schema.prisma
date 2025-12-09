@@ -98,6 +98,15 @@ model User {
   @@index([role])
 }
 
+enum SectorCurso {
+  GESTION_PUBLICA
+  SALUD
+  TECNOLOGIA
+  EDUCACION
+  PROYECTOS_PLANES
+  ENERGIA_MINERIA
+  OTRO
+}
 // ==========================================
 // MODELO: Curso (ACTUALIZADO - 3 campos + 2 relaciones nuevas)
 // ==========================================
@@ -112,6 +121,7 @@ model Curso {
   fechaFin         DateTime?
   duracionHoras    Int          @default(0)
   modalidad        Modalidad    @default(VIRTUAL)
+  sector           SectorCurso?
   certificado      Boolean      @default(true)
   precio           Float?  
   cupoMaximo       Int?
@@ -470,4 +480,31 @@ enum AuditAction {
   // Otros
   ADMIN_ACCESS
   API_ERROR
+}
+
+// ============================================
+// MÓDULO: NEWSLETTER
+// Descripción: Suscripciones al newsletter
+// ============================================
+
+model Newsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  
+  // Estado
+  activo    Boolean  @default(true)
+  
+  // Metadata
+  ip        String?
+  userAgent String?
+  origen    String?  // De dónde se suscribió (ej: "home", "footer", etc.)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([email])
+  @@index([activo])
+  @@index([createdAt])
+  @@map("newsletter")
 }

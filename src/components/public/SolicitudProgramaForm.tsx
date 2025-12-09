@@ -1,8 +1,8 @@
 /**
  * Componente: SolicitudProgramaForm
- * Versión: 1.0
+ * Versión: 1.1 - Botón de cerrar mejorado
  * Autor: Franz (@franzmr1)
- * Fecha: 2025-11-26
+ * Fecha: 2025-12-07
  * Descripción: Formulario para solicitar programa personalizado
  */
 
@@ -56,17 +56,17 @@ export default function SolicitudProgramaForm({
   const [folio, setFolio] = useState('');
 
   // Bloquear scroll cuando está abierto
-   useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style. overflow = 'unset';
     }
     
     return () => {
-      document. body.style.overflow = 'unset';
+      document.body.style.overflow = 'unset';
     };
-  }, [isOpen]); // ✅ Depende de isOpen
+  }, [isOpen]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -100,7 +100,7 @@ export default function SolicitudProgramaForm({
       // Preparar datos
       const payload = {
         ... formData,
-        numParticipantes: formData.numParticipantes 
+        numParticipantes: formData. numParticipantes 
           ? parseInt(formData. numParticipantes) 
           : null,
       };
@@ -233,11 +233,14 @@ export default function SolicitudProgramaForm({
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-[#003366] to-[#004488] p-6 text-white relative overflow-hidden">
+            {/* ✅ BOTÓN DE CERRAR EXTRA GRANDE - FÁCIL DE CLICKEAR */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              type="button"
+              className="absolute top-3 right-3 w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/30 rounded-full transition-all hover:scale-110 active:scale-95 cursor-pointer z-10"
+              aria-label="Cerrar formulario"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6 pointer-events-none" />
             </button>
 
             <div className="flex items-center gap-3 mb-2">
@@ -282,7 +285,7 @@ export default function SolicitudProgramaForm({
                       value={formData.nombres}
                       onChange={handleChange}
                       className={`w-full px-4 py-2. 5 border rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all ${
-                        errors.nombres ?  'border-red-500' : 'border-gray-300'
+                        errors.nombres ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="Ej: Juan Carlos"
                     />
@@ -304,7 +307,7 @@ export default function SolicitudProgramaForm({
                         value={formData.email}
                         onChange={handleChange}
                         className={`w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all ${
-                          errors.email ? 'border-red-500' : 'border-gray-300'
+                          errors. email ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="tu@email.com"
                       />
@@ -367,7 +370,7 @@ export default function SolicitudProgramaForm({
                         name="cargo"
                         value={formData.cargo}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-4 py-2. 5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all"
                         placeholder="Tu cargo actual"
                       />
                     </div>
@@ -392,7 +395,7 @@ export default function SolicitudProgramaForm({
                       name="servicioInteres"
                       value={formData.servicioInteres}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2. 5 border rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all ${
+                      className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all ${
                         errors.servicioInteres ? 'border-red-500' : 'border-gray-300'
                       }`}
                     >
@@ -533,7 +536,7 @@ export default function SolicitudProgramaForm({
                   <input
                     type="checkbox"
                     name="aceptoTerminos"
-                    checked={formData.aceptoTerminos}
+                    checked={formData. aceptoTerminos}
                     onChange={handleChange}
                     className="mt-1 w-4 h-4 text-[#FF6B35] border-gray-300 rounded focus:ring-[#FF6B35]"
                   />
@@ -565,7 +568,7 @@ export default function SolicitudProgramaForm({
                 {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Enviando...
+                    Enviando... 
                   </>
                 ) : (
                   <>
