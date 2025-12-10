@@ -448,6 +448,15 @@ enum AuditAction {
   TOKEN_REFRESH
   PASSWORD_CHANGE
   
+  // ✅ NUEVAS:  Seguridad avanzada
+  BOT_DETECTED                   
+  LOGIN_BLOCKED_PERMANENT       
+  RATE_LIMIT_EXCEEDED_IP        
+  RATE_LIMIT_EXCEEDED_EMAIL    
+  CAPTCHA_REQUIRED              
+  CAPTCHA_FAILED                
+  LOGIN_ERROR                  
+
   // Usuarios
   USER_CREATE
   USER_UPDATE

@@ -10,6 +10,7 @@ import { prisma } from '@/lib/prisma';
 import { getUserFromToken } from '@/lib/auth';
 import { docenteSchema } from '@/lib/validations/docente.validation';
 import { ZodError } from 'zod';
+import { auditLog } from '@/lib/audit-helper';
 
 /**
  * GET: Obtener un docente por ID
@@ -167,6 +168,15 @@ export async function PUT(
       where: { id },
       data: validatedData,
     });
+    await auditLog({
+      request,
+      action: 'DOCENTE_UPDATE',
+      entity:  'Docente',
+      entityId: id,
+      details: {
+        cambios: validatedData,
+      },
+    });
 
     return NextResponse.json({
       success: true,
@@ -202,13 +212,13 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }:  { params: Promise<{ id:  string }> }
 ) {
   try {
     const { id } = await params;
 
     // Verificar autenticación (solo SUPER_ADMIN puede eliminar)
-    const token = request.cookies. get('auth-token')?.value;
+    const token = request. cookies. get('auth-token')?.value;
     
     if (!token) {
       return NextResponse. json(
@@ -245,9 +255,26 @@ export async function DELETE(
       );
     }
 
+    // ✅ Guardar datos ANTES de eliminar
+    const docenteData = {
+      nombres: docente.nombres,
+      apellidos: docente.apellidos,
+      email: docente. email,
+      numeroDocumento: docente.numeroDocumento,
+    };
+
     // Eliminar docente (CASCADE eliminará también las asignaciones)
     await prisma.docente.delete({
       where: { id },
+    });
+
+    // ✅ REGISTRAR EN AUDIT LOG
+    await auditLog({
+      request,
+      action: 'DOCENTE_DELETE',
+      entity: 'Docente',
+      entityId: id,
+      details: docenteData,
     });
 
     return NextResponse.json({

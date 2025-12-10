@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getUserFromToken } from '@/lib/auth';
 import { solicitudUpdateSchema } from '@/lib/validations/solicitud';
+import { auditLog } from '@/lib/audit-helper';
 
 /**
  * PUT /api/solicitudes/[id]
@@ -95,8 +96,18 @@ export async function PUT(
       },
     });
 
-    // Log de auditoría
-    console.log(`[SOLICITUD_ACTUALIZADA] ID: ${id}, Usuario: ${currentUser.email}, Estado: ${solicitud.estado}`);
+        // ✅ DESPUÉS:
+    await auditLog({
+      request,
+      action: 'SOLICITUD_UPDATE',
+      entity: 'Solicitud',
+      entityId: id,
+      details: {
+        folio: solicitud.folio,
+        estado: solicitud.estado,
+        prioridad: solicitud.prioridad,
+      },
+    });
 
     return NextResponse.json({
       success: true,

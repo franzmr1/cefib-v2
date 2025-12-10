@@ -16,6 +16,7 @@ import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
 import { createUserSchema } from '@/lib/validations/user.validation';
 import { getUserFromToken } from '@/lib/auth';
+import { auditLog } from '@/lib/audit-helper';
 
 /**
  * GET /api/usuarios
@@ -203,7 +204,17 @@ export async function POST(request: NextRequest) {
     });
 
     // 8. Log de auditoría
-    console. log(`[AUDIT] Usuario creado: ${newUser.email} (${newUser.role}) por SUPER_ADMIN ${currentUser.email}`);
+    await auditLog({
+  request,
+  action: 'USER_CREATE',
+  entity:  'User',
+  entityId: newUser.id,
+  details: {
+    email: newUser.email,
+    role: newUser.role,
+    name: newUser.name,
+  },
+});
 
     return NextResponse.json(
       {

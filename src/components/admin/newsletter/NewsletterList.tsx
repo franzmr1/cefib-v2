@@ -52,26 +52,64 @@ export default function NewsletterList() {
   };
 
   const exportToCSV = () => {
-    const csv = [
-      ['Email', 'Estado', 'Fecha de Suscripción', 'Origen', 'IP'],
-      ... filteredSuscriptores.map(s => [
-        s.email,
-        s.activo ? 'Activo' : 'Inactivo',
-        new Date(s.subscribedAt). toLocaleDateString('es-PE'),
-        s.origen || 'N/A',
-        s.ipAddress || 'N/A',
-      ]),
-    ]
-      .map(row => row.join(','))
-      .join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document. createElement('a');
-    a. href = url;
-    a. download = `newsletter-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
+  // ✅ Función para escapar campos CSV correctamente
+  const escapeCsvField = (field: any): string => {
+    if (field === null || field === undefined) return '';
+    
+    const str = String(field);
+    
+    // Si contiene coma, comilla doble, punto y coma, o salto de línea, envolver en comillas
+    if (str.includes(',') || str.includes('"') || str.includes(';') || str.includes('\n') || str.includes('\r')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    
+    return str;
   };
+
+  // Headers
+  const headers = ['Email', 'Estado', 'Fecha de Suscripción', 'Origen', 'IP'];
+
+  // Filas de datos
+  const rows = filteredSuscriptores.map(s => [
+    escapeCsvField(s.email),
+    escapeCsvField(s.activo ? 'Activo' : 'Inactivo'),
+    escapeCsvField(
+      new Date(s.subscribedAt).toLocaleDateString('es-PE', {
+        day: '2-digit',
+        month:  '2-digit',
+        year:  'numeric',
+      })
+    ),
+    escapeCsvField(s.origen || 'N/A'),
+    escapeCsvField(s.ipAddress || 'N/A'),
+  ]);
+
+  // ✅ Usar punto y coma como delimitador (mejor para Excel en español)
+  const delimiter = ';';
+
+  const csvContent = [
+    headers.join(delimiter),
+    ...rows.map(row => row.join(delimiter))
+  ].join('\r\n'); // CRLF para Windows
+
+  // ✅ Agregar BOM UTF-8 para caracteres especiales
+  const BOM = '\uFEFF';
+
+  const blob = new Blob([BOM + csvContent], { 
+    type: 'text/csv;charset=utf-8;' 
+  });
+  
+  const url = window.URL.createObjectURL(blob);
+  const a = document. createElement('a');
+  a.href = url;
+  
+  // Nombre descriptivo con fecha
+  const timestamp = new Date().toISOString().split('T')[0];
+  a.download = `CEFIB_Newsletter_${timestamp}.csv`;
+  
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
 
   const filteredSuscriptores = suscriptores. filter(s =>
     s.email.toLowerCase(). includes(search.toLowerCase())

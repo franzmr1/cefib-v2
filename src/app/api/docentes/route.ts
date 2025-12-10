@@ -10,6 +10,7 @@ import { prisma } from '@/lib/prisma';
 import { getUserFromToken } from '@/lib/auth';
 import { docenteSchema } from '@/lib/validations/docente.validation';
 import { ZodError } from 'zod';
+import { auditLog } from '@/lib/audit-helper';
 
 /**
  * GET: Obtener todos los docentes
@@ -164,7 +165,18 @@ export async function POST(request: NextRequest) {
     const docente = await prisma.docente.create({
       data: validatedData,
     });
-
+    // ✅ AGREGAR auditoría
+    await auditLog({
+      request,
+      action: 'DOCENTE_CREATE',
+      entity:  'Docente',
+      entityId: docente.id,
+      details: {
+        nombres: docente.nombres,
+        apellidos: docente.apellidos,
+        email: docente.email,
+      },
+    });
     return NextResponse.json({
       success: true,
       docente,

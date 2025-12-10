@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { logAudit, getClientIP, getUserAgent } from '@/lib/audit-logger';
 import { getUserFromToken } from '@/lib/auth';
+import { auditLog } from '@/lib/audit-helper'; // ✅ IMPORTAR
 import { revalidatePath } from 'next/cache';
 
 /**

@@ -15,6 +15,7 @@ import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
 import { updateUserSchema } from '@/lib/validations/user.validation';
 import { getUserFromToken } from '@/lib/auth';
+import { auditLog } from '@/lib/audit-helper';
 
 /**
  * GET /api/usuarios/[id]
@@ -207,7 +208,18 @@ export async function PUT(
     });
 
     // 9. Log de auditoría
-    console.log(`[AUDIT] Usuario actualizado: ${updatedUser.email} por SUPER_ADMIN ${currentUser.email}`);
+    console.log(`[AUDIT] Usuario actualizado... `);
+
+    // ✅ DESPUÉS:
+    await auditLog({
+      request,
+      action: 'USER_UPDATE',
+      entity: 'User',
+      entityId: id,
+      details: {
+        cambios: validatedData,
+      },
+    });
 
     return NextResponse. json({
       success: true,
@@ -327,8 +339,17 @@ export async function DELETE(
     });
 
     // 7. Log de auditoría
-    console. log(`[AUDIT] Usuario eliminado: ${userToDelete.email} (${userToDelete.role}) por SUPER_ADMIN ${currentUser.email}`);
-
+        // ✅ DESPUÉS:
+    await auditLog({
+      request,
+      action:  'USER_DELETE',
+      entity: 'User',
+      entityId: id,
+      details: {
+        email: userToDelete.email,
+        role: userToDelete.role,
+      },
+    });
     return NextResponse.json({
       success: true,
       message: 'Usuario eliminado exitosamente',

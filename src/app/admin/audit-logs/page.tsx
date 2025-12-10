@@ -64,6 +64,19 @@ export default function AuditLogsPage() {
     if (filter === 'all') return true;
     if (filter === 'failed') return ! log.success;
     if (filter === 'auth') return log.action. includes('LOGIN') || log.action.includes('LOGOUT');
+    if (filter === 'security') {
+    return [
+      'BOT_DETECTED',
+      'LOGIN_BLOCKED_PERMANENT',
+      'RATE_LIMIT_EXCEEDED_IP',
+      'RATE_LIMIT_EXCEEDED_EMAIL',
+      'CAPTCHA_REQUIRED',
+      'CAPTCHA_FAILED',
+    ].includes(log.action);
+    }
+    
+    if (filter === 'bots') return log.action === 'BOT_DETECTED';
+    if (filter === 'blocked') return log.action === 'LOGIN_BLOCKED_PERMANENT';
     return true;
   });
 

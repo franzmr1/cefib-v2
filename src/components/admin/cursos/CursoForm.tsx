@@ -417,7 +417,39 @@ export default function CursoForm({ userId, cursoData }: CursoFormProps) {
                     </code>
                   </p>
                 </div>
-
+                 {/* ✅ AGREGAR ESTE CAMPO - Descripción Breve */}
+<div className="md:col-span-2">
+  <label className="block text-sm font-semibold text-gray-700 mb-2">
+    Descripción Breve
+    <span className="text-gray-500 font-normal ml-2">(Máx. 200 caracteres)</span>
+  </label>
+  <textarea
+    name="descripcionBreve"
+    value={formData.descripcionBreve}
+    onChange={handleChange}
+    maxLength={200}
+    rows={2}
+    placeholder="Breve resumen del curso que aparecerá en las tarjetas..."
+    className={`w-full px-4 py-3 border ${
+      errors.descripcionBreve ? 'border-red-500' : 'border-gray-300'
+    } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none`}
+  />
+  <div className="flex items-center justify-between mt-1">
+    {errors.descripcionBreve ?  (
+      <p className="text-sm text-red-600 flex items-center gap-1">
+        <AlertCircle className="w-4 h-4" />
+        {errors.descripcionBreve}
+      </p>
+    ) : (
+      <p className="text-xs text-gray-500">
+        Se mostrará en la tarjeta del curso
+      </p>
+    )}
+    <span className="text-xs text-gray-500">
+      {formData.descripcionBreve.length}/200
+    </span>
+  </div>
+</div>     
                 {/* Descripción con RichTextEditor */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
